@@ -21,7 +21,7 @@
     <body class="bg-black">
 
         <div class="form-box" id="login-box">
-            <div class="header">E-Bengkel Login</div>
+            <div class="header">E-Bengkel Login Page</div>
             <form action="<?php echo site_url('login/act_login'); ?>" method="post">
                 <div class="body bg-gray">
                     <div class="form-group">
