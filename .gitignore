@@ -10,6 +10,8 @@ application/logs/*
 
 user_guide/*
 
+application/config/database.php
+
 composer.lock
 
 user_guide_src/build/*
