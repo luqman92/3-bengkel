@@ -2,7 +2,7 @@
 <html class="bg-black">
     <head>
         <meta charset="UTF-8">
-        <title>AdminLTE | Log in</title>
+        <title>E-Bengkel | Log in</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <!-- bootstrap 3.0.2 -->
         <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -21,7 +21,7 @@
     <body class="bg-black">
 
         <div class="form-box" id="login-box">
-            <div class="header">Sign In</div>
+            <div class="header">E-Bengkel Login</div>
             <form action="<?php echo site_url('login/act_login'); ?>" method="post">
                 <div class="body bg-gray">
                     <div class="form-group">
