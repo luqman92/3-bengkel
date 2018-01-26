@@ -23,8 +23,8 @@ date_default_timezone_set('Asia/Jakarta');
 | a PHP script and you can easily do that on your own.
 |
 */
-//$config['base_url'] = 'http://localhost/mg-bengkel/';
-$config['base_url'] = 'http://e-bengkel.lhnsoft.com';
+$config['base_url'] = 'http://localhost/mg-bengkel/';
+//$config['base_url'] = 'http://e-bengkel.lhnsoft.com';
 
 /*
 |--------------------------------------------------------------------------
