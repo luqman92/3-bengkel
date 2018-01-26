@@ -97,10 +97,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
-	'database' => 'mg_bengkel',
+	'hostname' => 'mysql.hostinger.co.id',
+	'username' => 'u699830034_ebgl',
+	'password' => '3bengkel',
+	'database' => 'u699830034_ebgl',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
