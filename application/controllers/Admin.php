@@ -17,6 +17,7 @@ class Admin extends CI_Controller {
 		$this->load->model('Cabang_model','cbg');
 		$this->load->model('Customer_model','cstm');
 		$this->load->model('Kunjungan_model','kjg');
+		$this->load->model('PMB_model','pmb');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -310,7 +311,26 @@ class Admin extends CI_Controller {
 	public function sparepart()
 	{
 		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		$data['spareparts'] = $this->Model_admin->manualQuery('SELECT * FROM sparepart')->result();
+		$data['spareparts'] = $this->Model_admin->manualQuery('SELECT
+								a.key_id,
+								a.harga_pokok,
+								a.harga_jual,
+								a.qty,
+								a.no_pmb,
+								a.tgl,
+								a.key_id,
+								b.Merek,
+								b.Tipe,
+								b.diskripsi,
+								c.kode,
+								c.deskripsi,
+								d.supplier
+								FROM
+								stok AS a
+								LEFT JOIN sparepart AS b ON a.id = b.kode
+								LEFT JOIN groupsparepart AS c ON b.id_Grup = c.kode AND b.grup = c.deskripsi
+								LEFT JOIN pmb_sparepart AS d ON d.no_pmb = a.no_pmb
+								')->result();
 		$this->template_admin->load('template_admin','Moduls/sparepart/index',$data);
 	}
 
@@ -493,6 +513,98 @@ class Admin extends CI_Controller {
 		$data['pemasukans'] = $this->Model_admin->manualQuery('SELECT * FROM pemasukan ORDER BY tgl DESC')->result();
 		$this->template_admin->load('template_admin','Moduls/pemasukanbengkel/index',$data);
 	}
+
+	public function pembeliansparepart()
+	{
+		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
+		//$data['pemasukans'] = $this->Model_admin->manualQuery('SELECT * FROM pemasukan ORDER BY tgl DESC')->result();
+		$this->template_admin->load('template_admin','Moduls/pembeliansparepart/index');
+	}
+
+	public function pmb_add()
+	{
+		$this->template_admin->load('template_admin','Moduls/pmb_add/index');
+	}
+
+	/*AJAX PEMASUKAN BENGKEL*/
+	public function ajax_list_pmb()
+    {
+    	$cbg = $this->session->userdata('cabang');
+		$list = $this->pmb->get_datatables($cbg);
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $pmb) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $pmb->kode;
+            $row[] = $pmb->tgl;
+            $row[] = $pmb->supplier;
+            $row[] = $pmb->diskripsi;
+            $row[] = $pmb->qty;
+            $row[] = $pmb->harga;
+            $row[] = $pmb->total;
+           
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->pmb->count_all($cbg),
+                        "recordsFiltered" => $this->pmb->count_filtered($cbg),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_pmb($id)
+    {
+        $data = $this->pmb->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_pmb()
+    {
+        $data = array(
+                'firstName' => $this->input->post('firstName'),
+                'lastName' => $this->input->post('lastName'),
+                'gender' => $this->input->post('gender'),
+                'address' => $this->input->post('address'),
+                'dob' => $this->input->post('dob'),
+            );
+        $insert = $this->pmb->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_pmb()
+    {
+        $data = array(
+                'firstName' => $this->input->post('firstName'),
+                'lastName' => $this->input->post('lastName'),
+                'gender' => $this->input->post('gender'),
+                'address' => $this->input->post('address'),
+                'dob' => $this->input->post('dob'),
+            );
+        $this->pmb->update(array('id' => $this->input->post('id')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_pmb($id)
+    {
+        $this->pmb->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX PEMASUKAN BENGKEL*/
 
 	public function biayaoperasional()
 	{

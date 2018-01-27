@@ -1,12 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Customer_model extends CI_Model {
+class Pmb_model extends CI_Model {
 
-	var $table = 'customer';
-	var $column_order = array('no_polisi','nama','alamat','hp',null); //set column field database for datatable orderable
-	var $column_search = array('no_polisi','nama','hp'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('tanggal' => 'desc'); // default order 
+	var $table = 'sparepart_pmb';
+	var $column_order = array('kode','diskripsi','qty','harga',null); //set column field database for datatable orderable
+	var $column_search = array('kode','diskripsi','qty'); //set column field database for datatable searchable just firstname , lastname , address are searchable
+	var $order = array('b.tgl' => 'desc'); // default order 
 
 	public function __construct()
 	{
@@ -17,16 +17,25 @@ class Customer_model extends CI_Model {
 	private function _get_datatables_query($id="")
 	{
 		
-		if($id==''){
+		/*if($id=='CBG-000001'){
 			$this->db->select('*');
 			$this->db->from($this->table);
 		}else{
 			$this->db->select('*');
 			$this->db->from($this->table);
 			$this->db->where('cabang_id', $id);
-		}
-		
-		//$this->db->simple_query('SELECT * FROM customer');
+		}*/
+		if($id==''){
+			$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
+			$this->db->from($this->table.' AS a');
+			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
+        }else{
+        	$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
+			$this->db->from($this->table.' AS a');
+			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
+			$this->db->where('b.cabang_id', $id);
+        }
+		//$this->db->simple_query('SELECT * FROM '.$this->table);
 		$i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 
@@ -70,17 +79,35 @@ class Customer_model extends CI_Model {
 		return $query->result();
 	}
 
-	function count_filtered()
+	function count_filtered($id="")
 	{
-		$this->_get_datatables_query();
+		$this->_get_datatables_query($id);
 		$query = $this->db->get();
 		return $query->num_rows();
 	}
 
-	public function count_all()
+	public function count_all($id="")
 	{
-		$this->db->from($this->table);
-		return $this->db->count_all_results();
+		if($id==''){
+			$this->db->from($this->table);
+			return $this->db->count_all_results();
+		}else{
+			$this->db->from($this->table.' AS a');
+			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
+			$this->db->where('b.cabang_id',$id);
+			return $this->db->count_all_results();
+		}
+
+		/*if($id==''){
+			$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
+			$this->db->from($this->table.' AS a');
+			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
+        }else{
+        	$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
+			$this->db->from($this->table.' AS a');
+			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
+			$this->db->where('b.cabang_id', $id);
+        }*/
 	}
 
 	public function get_by_id($id)

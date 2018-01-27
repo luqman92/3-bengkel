@@ -1,6 +1,7 @@
           <!-- http://mbahcoding.com/tutorial/php/codeigniter/codeigniter-ajax-crud-using-bootstrap-modals-and-datatable.html -->
           <!-- https://anekaweb.com/anekastokv2/home -->
           <!-- http://www.kodiing.com/2015/04/desain-sistem-database-stok-barang.html -->
+          <!-- 2bbf5199382b2bb710665ff7e21265605a6a3be3 -->
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
