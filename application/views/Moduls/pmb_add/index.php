@@ -1,12 +1,12 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Data Pembelian Sparepart
-                        <small>List Data Pembelian Sparepart</small>
+                        Input Pembelian Sparepart
+                        <small>List Input Pembelian Sparepart</small>
                     </h1>
                     <ol class="breadcrumb">
                         <li><a href="<?php echo base_url(); ?>index.php/admin"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li class="active">List Data Pembelian Sparepart</li>
+                        <li class="active">List Input Pembelian Sparepart</li>
                     </ol>
                 </section>
 
@@ -18,43 +18,129 @@
                                 <div class="box-header">
                                     <!-- <h3 class="box-title">Data Table With Full Features</h3> -->                                    
                                 </div><!-- /.box-header -->
-                                <div class="box-body table-responsive">
-                                <!-- <a class="btn btn-primary" href="<?php echo base_url() ?>admin/addmerk"><i class="fa fa-plus-circle"></i> Data Customer</a> -->
-                                <br><br>
-                                    <table id="table" class="table table-bordered table-striped" cellspacing="0" width="100%">
+                                <div class="box-body">
+                                    <br><br>
+                                    <form action="<?=site_url('admin/pmb_add_act')?>" method="post">
+                                    <table class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>No</th>
-                                                <th>Kode</th>
-                                                <th>Diskripsi</th>
-                                                <th>qty</th>
-                                                <th>Harga</th>
+                                                <th>Nama Barang</th>
+                                                <th>Jumlah</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                       
-                                        </tbody>
-                                        <tfoot>
+                                        <div class="row">
                                             <tr>
-                                                <th>No</th>
-                                                <th>Kode</th>
+                                                <td>
+                                                    <div class="col-xs-12">
+                                                    <select id="searchbrg" class="form-control" name="kode">
+                                                        <option value=""></option>    
+                                                        <?php
+                                                            foreach ($sprs as $spr) {
+                                                                ?>
+                                                                <option value="<?=$spr->kode?>"><?=$spr->diskripsi." | ".$spr->harga?></option>
+                                                                <?php
+                                                            }
+                                                        ?>
+                                                    </select>
+                                                    </div>
+                                                </td>
+                                                <td><div class="col-xs-12"><input class="form-control" name="qty"></div></td>
+                                                <td><div class="col-xs-12"><input class="btn btn-primary" type="submit" name="btn_addpmb" value="Tambah"></div></td>
+                                            </tr>
+                                        </div>
+                                        </tbody>
+                                    </table>
+                                    </form>
+
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Kode Part</th>
                                                 <th>Diskripsi</th>
-                                                <th>qty</th>
-                                                <th>Harga</th>
+                                                <th>@Harga</th>
+                                                <th>Qty</th>
+                                                <th>Pot(%)</th>
+                                                <th>Total Harga</th>
                                                 <th>Action</th>
                                             </tr>
-                                        </tfoot>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $totalx = '';
+                                            foreach ($sprpmbs as $sprpmb) {
+                                                $totalx = $totalx+$sprpmb->total;
+                                            ?>
+                                            <tr>
+                                                <td><?=$sprpmb->kode?></td>
+                                                <td><?=$sprpmb->diskripsi?></td>
+                                                <td><?=$sprpmb->harga?></td>
+                                                <td><?=$sprpmb->qty?></td>
+                                                <td><?=$sprpmb->diskon?></td>
+                                                <td><?="Rp. ".$sprpmb->total?></td>
+                                                <td><a href="<?=site_url('admin/pmb_del/'.$sprpmb->key_id)?>">Hapus</a></td>
+                                            </tr>
+                                            <?php
+                                            //$totalx++;
+                                            }
+                                            ?>
+                                            <tr>
+                                                <td colspan="5" style="text-align:right;"><b>Total Harga</b></td>
+                                                <td colspan="2"><b><?="Rp. ".$totalx;?></b></td>
+                                            </tr>
+                                        </tbody>
                                     </table>
+
+                                    <form action="<?=site_url('admin/')?>" method="post">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <td>Kode Pembelian Sparepart</td>
+                                                    <td><input class="form-control" value="<?=$no_pmb?>" readonly></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tanggal</td>
+                                                    <td><input class="form-control" value="<?=date('Y-m-d');?>"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Supplier</td>
+                                                    <td>
+                                                        <select id="searchspp" class="form-control" name="">
+                                                            <option value=""></option>
+                                                            <?php
+                                                            foreach ($spps as $spp) {
+                                                                ?>
+                                                            <option value="<?=$spp->supplier_id?>"><?=$spp->nama?></option>
+                                                                <?php
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2"><input class="btn btn-primary" type="submit" value="Simpan"></td>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </form>
                                 </div><!-- /.box-body -->
                             </div><!-- /.box -->
                         </div>
                     </div>
                 </section>
-
+<script>
+    $(document).ready(function(){
+       $("#searchbrg").select2({
+            placeholder:"Please Select"
+       }); 
+        $("#searchspp").select2({
+            placeholder:"Please Select"
+       }); 
+    });
+</script>
 <!-- SCRIPT -->
 <script type="text/javascript">
- 
 var save_method; //for save method string
 var table;
  

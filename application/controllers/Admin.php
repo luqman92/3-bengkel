@@ -18,6 +18,7 @@ class Admin extends CI_Controller {
 		$this->load->model('Customer_model','cstm');
 		$this->load->model('Kunjungan_model','kjg');
 		$this->load->model('PMB_model','pmb');
+		$this->load->model('Masterbarang_model','mb');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -124,7 +125,7 @@ class Admin extends CI_Controller {
 		$this->template_admin->load('template_admin','Moduls/customer/index');
 	}
 
-	/*AJAX TRX BENGKEL*/
+	/*AJAX Customer*/
 	public function ajax_list_customer()
     {
     	$cbg = $this->session->userdata('cabang');
@@ -199,7 +200,7 @@ class Admin extends CI_Controller {
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
-	/*AJAX TRX BENGKEL*/
+	/*AJAX Customer*/
 
 		public function cabang()
 	{
@@ -308,31 +309,93 @@ class Admin extends CI_Controller {
 		$this->template_admin->load('template_admin','Moduls/motor/index',$data);
 	}
 
-	public function sparepart()
+	public function masterbarang()
 	{
 		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		$data['spareparts'] = $this->Model_admin->manualQuery('SELECT
-								a.key_id,
-								a.harga_pokok,
-								a.harga_jual,
-								a.qty,
-								a.no_pmb,
-								a.tgl,
-								a.key_id,
-								b.Merek,
-								b.Tipe,
-								b.diskripsi,
-								c.kode,
-								c.deskripsi,
-								d.supplier
-								FROM
-								stok AS a
-								LEFT JOIN sparepart AS b ON a.id = b.kode
-								LEFT JOIN groupsparepart AS c ON b.id_Grup = c.kode AND b.grup = c.deskripsi
-								LEFT JOIN pmb_sparepart AS d ON d.no_pmb = a.no_pmb
-								')->result();
-		$this->template_admin->load('template_admin','Moduls/sparepart/index',$data);
+		
+		$data = array(
+			'KdBrg' =>$this->mb->getKodeBrg(),
+		);
+		$this->template_admin->load('template_admin','Moduls/masterbarang/index',$data);
 	}
+
+	/*AJAX MasterBarang*/
+	public function ajax_list_mb()
+    {
+    	//$cbg = $this->session->userdata('cabang');
+    	//$list = $this->mb->get_datatables($cbg);
+    	$list = $this->mb->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $mb) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $mb->KodeBarang;
+            $row[] = $mb->NamaBarang;
+            $row[] = $mb->Satuan;
+            $row[] = $mb->HPP;
+            $row[] = $mb->HargaJual;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_masterbrg('."'".$mb->KodeBarang."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_masterbrg('."'".$mb->KodeBarang."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->mb->count_all(),
+                        "recordsFiltered" => $this->mb->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_mb($id)
+    {
+        $data = $this->mb->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_mb()
+    {
+        $data = array(
+                'KodeBarang' => $this->input->post('KodeBarang'),
+                'NamaBarang' => $this->input->post('NamaBarang'),
+                'Satuan' => $this->input->post('Satuan'),
+                'HPP' => $this->input->post('HPP'),
+                'HargaJual' => $this->input->post('HargaJual'),
+            );
+        $insert = $this->mb->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_mb()
+    {
+        $data = array(
+                'NamaBarang' => $this->input->post('NamaBarang'),
+                'Satuan' => $this->input->post('Satuan'),
+                'HPP' => $this->input->post('HPP'),
+                'HargaJual' => $this->input->post('HargaJual'),
+            );
+        $this->mb->update(array('KodeBarang' => $this->input->post('KodeBarang')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_mb($id)
+    {
+        $this->mb->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX MasterBarang*/
 
 	public function kota()
 	{
@@ -521,11 +584,6 @@ class Admin extends CI_Controller {
 		$this->template_admin->load('template_admin','Moduls/pembeliansparepart/index');
 	}
 
-	public function pmb_add()
-	{
-		$this->template_admin->load('template_admin','Moduls/pmb_add/index');
-	}
-
 	/*AJAX PEMASUKAN BENGKEL*/
 	public function ajax_list_pmb()
     {
@@ -546,8 +604,8 @@ class Admin extends CI_Controller {
             $row[] = $pmb->total;
            
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            /*$row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
  
             $data[] = $row;
         }
@@ -605,6 +663,53 @@ class Admin extends CI_Controller {
         echo json_encode(array("status" => TRUE));
     }
 	/*AJAX PEMASUKAN BENGKEL*/
+
+	public function pmb_add()
+	{
+		$spr = $this->Model_admin->manualQuery('SELECT * FROM sparepart')->result();
+		$sprpmb = $this->Model_admin->manualQuery('SELECT a.key_id,a.kode,b.diskripsi,a.harga,a.qty,a.diskon,a.total FROM sparepart_pmb AS a LEFT JOIN sparepart AS b ON b.kode = a.kode where kondisi="new"')->result();
+		$spps = $this->Model_admin->manualQuery('SELECT * FROM supplier')->result();
+
+		$no_pmb = "PB".rand(100000000,999999999)."-".date('dmy');
+		$data = array(
+			'sprs' => $spr,
+			'sprpmbs' => $sprpmb,
+			'no_pmb' => $no_pmb,
+			'spps' => $spps,
+			);
+		$this->template_admin->load('template_admin','Moduls/pmb_add/index',$data);
+	}
+
+	public function pmb_del($id)
+	{
+		$where = array('key_id'=>$id);
+    	
+    	$this->Model_admin->del_data($where,'sparepart_pmb');
+		redirect('admin/pmb_add');
+	}
+
+	public function pmb_add_act()
+	{
+		$kode = $this->input->post('kode');
+		$qty = $this->input->post('qty');
+		/*PB<?=rand(100000000,999999999)?>-<?=date('dmy')?>*/
+		$rn = "PB".rand(100000000,999999999)-date('dmy');
+
+		$query = $this->Model_admin->manualQuery('SELECT * FROM sparepart WHERE kode="'.$kode.'"');
+		$row = $query->row_array();
+		$hargax = $row['harga'];
+		$total = $hargax*$qty;
+		$data = array(
+			'kode'=>$kode,
+			'qty'=>$qty,
+			'harga'=>$hargax,
+			'total'=>$total,
+			'kondisi'=>'new',
+			);
+
+		$this->Model_admin->create_data($data,'sparepart_pmb');
+		redirect('admin/pmb_add');
+	}
 
 	public function biayaoperasional()
 	{

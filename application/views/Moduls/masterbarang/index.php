@@ -1,12 +1,12 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Data Pembelian Sparepart
-                        <small>List Data Pembelian Sparepart</small>
+                        Data Master Barang
+                        <small>List Data Master Barang</small>
                     </h1>
                     <ol class="breadcrumb">
                         <li><a href="<?php echo base_url(); ?>index.php/admin"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li class="active">List Data Pembelian Sparepart</li>
+                        <li class="active">List Data Master Barang</li>
                     </ol>
                 </section>
 
@@ -19,34 +19,34 @@
                                     <!-- <h3 class="box-title">Data Table With Full Features</h3> -->                                    
                                 </div><!-- /.box-header -->
                                 <div class="box-body table-responsive">
-                                <a class="btn btn-primary" href="<?php echo base_url() ?>admin/pmb_add"><i class="fa fa-plus-circle"></i> Pembelian Sparepart</a>
+                                <!-- <a class="btn btn-primary" href="<?php echo base_url() ?>admin/addmerk"><i class="fa fa-plus-circle"></i> Data Sparepart</a> -->
+                                 <button class="btn btn-success" onclick="add_masterbrg()"><i class="glyphicon glyphicon-plus"></i> Master Barang</button>
                                 <br><br>
-                                    <table id="table" class="table table-bordered table-striped" cellspacing="0" width="100%">
+                                    <table id="table" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode</th>
-                                                <th>Tanggal</th>
-                                                <th>Supplier</th>
-                                                <th>Diskripsi</th>
-                                                <th>qty</th>
-                                                <th>Harga</th>
-                                                <th>Total Harga</th>
+                                                <th>Kode Barang</th>
+                                                <th>Nama Barang</th>
+                                                <th>Satuan</th>
+                                                <th>Harga Pokok</th>
+                                                <th>Harga Jual</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                       
+                                        
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode</th>
-                                                <th>Tanggal</th>
-                                                <th>Supplier</th>
-                                                <th>Diskripsi</th>
-                                                <th>qty</th>
-                                                <th>Harga</th>
-                                                <th>Total Harga</th>
+                                                <th>Kode Barang</th>
+                                                <th>Nama Barang</th>
+                                                <th>Satuan</th>
+                                                <th>Harga Pokok</th>
+                                                <th>Harga Jual</th>
+                                                <th>Action</th>
+                                                
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -73,7 +73,7 @@ $(document).ready(function() {
  
         // Load data for the table's content from an Ajax source
         "ajax": {
-            "url": "<?php echo site_url('admin/ajax_list_pmb')?>",
+            "url": "<?php echo site_url('admin/ajax_list_mb')?>",
             "type": "POST"
         },
  
@@ -101,17 +101,17 @@ $(document).ready(function() {
  
  
  
-function add_person()
+function add_masterbrg()
 {
     save_method = 'add';
     $('#form')[0].reset(); // reset form on modals
     $('.form-group').removeClass('has-error'); // clear error class
     $('.help-block').empty(); // clear error string
     $('#modal_form').modal('show'); // show bootstrap modal
-    $('.modal-title').text('Add Person'); // Set Title to Bootstrap modal title
+    $('.modal-title').text('Add Master Barang'); // Set Title to Bootstrap modal title
 }
  
-function edit_person(id)
+function edit_masterbrg(id)
 {
     save_method = 'update';
     $('#form')[0].reset(); // reset form on modals
@@ -120,22 +120,19 @@ function edit_person(id)
  
     //Ajax Load data from ajax
     $.ajax({
-        url : "<?php echo site_url('admin/ajax_edit_pmb/')?>/" + id,
+        url : "<?php echo site_url('admin/ajax_edit_mb/')?>" + id,
         type: "GET",
         dataType: "JSON",
         success: function(data)
         {
  
-            $('[name="id"]').val(data.id);
-            $('[name="kode"]').val(data.kode);
-            $('[name="jenis"]').val(data.jenis);
-            $('[name="keterangan"]').val(data.keterangan);
-            $('[name="harga"]').val(data.harga);
-            $('[name="qty"]').val(data.qty);
-            $('[name="pot]').val(data.pot);
-            $('[name="total"]').val(data.total);
+            $('[name="KodeBarang"]').val(data.KodeBarang);
+            $('[name="NamaBarang"]').val(data.NamaBarang);
+            $('[name="Satuan"]').val(data.Satuan);
+            $('[name="HPP"]').val(data.HPP);
+            $('[name="HargaJual"]').val(data.HargaJual);
             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-            $('.modal-title').text('Edit Person'); // Set title to Bootstrap modal title
+            $('.modal-title').text('Edit Master Barang'); // Set title to Bootstrap modal title
  
         },
         error: function (jqXHR, textStatus, errorThrown)
@@ -158,9 +155,9 @@ function save()
     var url;
  
     if(save_method == 'add') {
-        url = "<?php echo site_url('admin/ajax_add_pmb')?>";
+        url = "<?php echo site_url('admin/ajax_add_mb')?>";
     } else {
-        url = "<?php echo site_url('admin/ajax_update_pmb')?>";
+        url = "<?php echo site_url('admin/ajax_update_mb')?>";
     }
  
     // ajax adding data to database
@@ -193,13 +190,13 @@ function save()
     });
 }
  
-function delete_person(id)
+function delete_masterbrg(id)
 {
     if(confirm('Are you sure delete this data?'))
     {
         // ajax delete data to database
         $.ajax({
-            url : "<?php echo site_url('admin/ajax_delete_pmb')?>/"+id,
+            url : "<?php echo site_url('admin/ajax_delete_mb')?>/"+id,
             type: "POST",
             dataType: "JSON",
             success: function(data)
@@ -225,48 +222,48 @@ function delete_person(id)
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title">Person Form</h3>
+                <h3 class="modal-title">Master Barang Form</h3>
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="id"/> 
                     <div class="form-body">
                         <div class="form-group">
-                            <label class="control-label col-md-3">First Name</label>
+                            <label class="control-label col-md-3">Kode Barang</label>
                             <div class="col-md-9">
-                                <input name="firstName" placeholder="First Name" class="form-control" type="text">
+                                <input name="KodeBarang" placeholder="" class="form-control" type="text" value="<?=$KdBrg?>" readonly>
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Last Name</label>
+                            <label class="control-label col-md-3">Nama Barang</label>
                             <div class="col-md-9">
-                                <input name="lastName" placeholder="Last Name" class="form-control" type="text">
+                                <input name="NamaBarang" placeholder="" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Gender</label>
+                            <label class="control-label col-md-3">Satuan</label>
                             <div class="col-md-9">
-                                <select name="gender" class="form-control">
-                                    <option value="">--Select Gender--</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
+                                <select name="Satuan" class="form-control">
+                                    <option value="">--Select Satuan--</option>
+                                    <option value="PCS">PCS</option>
+                                    <option value="PACk">PACK</option>
                                 </select>
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Address</label>
+                            <label class="control-label col-md-3">Harga Pokok</label>
                             <div class="col-md-9">
-                                <textarea name="address" placeholder="Address" class="form-control"></textarea>
+                                <input name="HPP" placeholder="" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Date of Birth</label>
+                            <label class="control-label col-md-3">Harga Jual</label>
                             <div class="col-md-9">
-                                <input name="dob" placeholder="yyyy-mm-dd" class="form-control datepicker" type="text">
+                                <input name="HargaJual" placeholder="" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>

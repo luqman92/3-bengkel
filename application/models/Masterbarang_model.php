@@ -1,12 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Pmb_model extends CI_Model {
+class Masterbarang_model extends CI_Model {
 
-	var $table = 'sparepart_pmb';
-	var $column_order = array('kode','diskripsi','qty','harga',null); //set column field database for datatable orderable
-	var $column_search = array('kode','diskripsi','qty'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('b.tgl' => 'desc'); // default order 
+	var $table = 'masterbarang';
+	var $column_order = array('KodeBarang','NamaBarang','Satuan','HPP','HargaJual',null); //set column field database for datatable orderable
+	var $column_search = array('KodeBarang','NamaBarang','Satuan'); //set column field database for datatable searchable just firstname , lastname , address are searchable
+	var $order = array('a.KodeBarang' => 'asc'); // default order 
 
 	public function __construct()
 	{
@@ -14,7 +14,7 @@ class Pmb_model extends CI_Model {
 		$this->load->database();
 	}
 
-	private function _get_datatables_query($id="")
+	private function _get_datatables_query()
 	{
 		
 		/*if($id=='CBG-000001'){
@@ -25,18 +25,10 @@ class Pmb_model extends CI_Model {
 			$this->db->from($this->table);
 			$this->db->where('cabang_id', $id);
 		}*/
-		if($id==''){
-			$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
+			$this->db->select('a.KodeBarang,a.NamaBarang,a.Satuan,a.HPP,a.HargaJual');
 			$this->db->from($this->table.' AS a');
-			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
-        }else{
-        	$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
-			$this->db->from($this->table.' AS a');
-			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb','inner');
-			$this->db->where('b.cabang_id', $id);
-        }
-		//$this->db->simple_query('SELECT * FROM '.$this->table);
-		$i = 0;
+			//$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
+        $i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 
 		{
@@ -70,50 +62,32 @@ class Pmb_model extends CI_Model {
 		}
 	}
 
-	function get_datatables($id="")
+	function get_datatables()
 	{
-		$this->_get_datatables_query($id);
+		$this->_get_datatables_query();
 		if($_POST['length'] != -1)
 		$this->db->limit($_POST['length'], $_POST['start']);
 		$query = $this->db->get();
 		return $query->result();
 	}
 
-	function count_filtered($id="")
+	function count_filtered()
 	{
-		$this->_get_datatables_query($id);
+		$this->_get_datatables_query();
 		$query = $this->db->get();
 		return $query->num_rows();
 	}
 
-	public function count_all($id="")
+	public function count_all()
 	{
-		if($id==''){
 			$this->db->from($this->table);
 			return $this->db->count_all_results();
-		}else{
-			$this->db->from($this->table.' AS a');
-			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
-			$this->db->where('b.cabang_id',$id);
-			return $this->db->count_all_results();
-		}
-
-		/*if($id==''){
-			$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
-			$this->db->from($this->table.' AS a');
-			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
-        }else{
-        	$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
-			$this->db->from($this->table.' AS a');
-			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
-			$this->db->where('b.cabang_id', $id);
-        }*/
 	}
 
 	public function get_by_id($id)
 	{
 		$this->db->from($this->table);
-		$this->db->where('customer_id',$id);
+		$this->db->where('KodeBarang',$id);
 		$query = $this->db->get();
 
 		return $query->row();
@@ -133,23 +107,23 @@ class Pmb_model extends CI_Model {
 
 	public function delete_by_id($id)
 	{
-		$this->db->where('customer_id', $id);
+		$this->db->where('KodeBarang', $id);
 		$this->db->delete($this->table);
 	}
 
 	// KODE BARANG
-    function getKodeCabang(){
-        $q = $this->db->query("select MAX(RIGHT(cabang_id,6)) as kd_max from cabang");
+    function getKodeBrg(){
+        $q = $this->db->query("select MAX(RIGHT(KodeBarang,6)) as kd_max from masterbarang");
         $kd = "";
         if($q->num_rows()>0){
             foreach($q->result() as $k){
                 $tmp = ((int)$k->kd_max)+1;
-                $kd = sprintf("%06s", $tmp);
+                $kd = sprintf("%07s", $tmp);
             }
         }else{
-            $kd = "000001";
+            $kd = "00000001";
         }
-        return "CBG-".$kd;
+        return "BRG".$kd;
     }
 
 

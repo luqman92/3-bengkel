@@ -112,7 +112,7 @@
                         $main_menu = $this->db->order_by('position', 'ASC')->get_where('menu', array('parent_id' => 0,'group_id' => 1,'active' => 'Y'));
                         foreach ($main_menu->result() as $main) {
                             // Query untuk mencari data sub menu
-                            $sub_menu = $this->db->order_by('position', 'ASC')->get_where('menu', array('parent_id' => $main->id));
+                            $sub_menu = $this->db->order_by('position', 'ASC')->get_where('menu', array('parent_id' => $main->id,'active' => 'Y'));
                             // periksa apakah ada sub menu
                             if ($sub_menu->num_rows() > 0) {
                                 // main menu dengan sub menu
