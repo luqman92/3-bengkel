@@ -122,7 +122,22 @@ class Admin extends CI_Controller {
 
 		public function customer()
 	{
-		$this->template_admin->load('template_admin','Moduls/customer/index');
+		$mtr = $this->Model_admin->manualQuery('SELECT
+													a.mtr_id,
+													a.kode,
+													a.merk_id,
+													a.tipe,
+													a.jenis,
+													a.cc,
+													a.tahun,
+													b.merk_motor 
+												FROM
+													motor AS a
+													INNER JOIN merkmotor AS b ON a.merk_id = b.merk_id')->result();
+		$data = array(
+				'mtrs' => $mtr,
+				); 
+		$this->template_admin->load('template_admin','Moduls/customer/index',$data);
 	}
 
 	/*AJAX Customer*/
@@ -142,8 +157,8 @@ class Admin extends CI_Controller {
             $row[] = $cstm->hp;
             
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_customer('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_customer('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  
             $data[] = $row;
         }
@@ -168,12 +183,14 @@ class Admin extends CI_Controller {
  
     public function ajax_add_customer()
     {
-        $data = array(
-                'firstName' => $this->input->post('firstName'),
-                'lastName' => $this->input->post('lastName'),
-                'gender' => $this->input->post('gender'),
-                'address' => $this->input->post('address'),
-                'dob' => $this->input->post('dob'),
+    	$cbg = $this->session->userdata('cabang');
+    	$data = array(
+                'no_polisi' => $this->input->post('no_polisi'),
+                'nama' => $this->input->post('nama'),
+                'tipe' => $this->input->post('tipe'),
+                'alamat' => $this->input->post('alamat'),
+                'hp' => $this->input->post('hp'),
+                'cabang_id' => $this->input->post('cabang_id'),
             );
         $insert = $this->cstm->save($data);
         header('Content-Type: application/json');
@@ -183,13 +200,13 @@ class Admin extends CI_Controller {
     public function ajax_update_customer()
     {
         $data = array(
-                'firstName' => $this->input->post('firstName'),
-                'lastName' => $this->input->post('lastName'),
-                'gender' => $this->input->post('gender'),
-                'address' => $this->input->post('address'),
-                'dob' => $this->input->post('dob'),
+                'no_polisi' => $this->input->post('no_polisi'),
+                'nama' => $this->input->post('nama'),
+                'tipe' => $this->input->post('tipe'),
+                'alamat' => $this->input->post('alamat'),
+                'hp' => $this->input->post('hp'),
             );
-        $this->cstm->update(array('id' => $this->input->post('id')), $data);
+        $this->cstm->update(array('customer_id' => $this->input->post('customer_id')), $data);
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
