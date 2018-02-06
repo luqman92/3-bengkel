@@ -7,7 +7,7 @@
                     </h1>
                     <ol class="breadcrumb">
                         <li><a href="<?php echo base_url(); ?>index.php/admin"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li class="active">List Data Pemasukan Bengkel</li>
+                        <li class="active">List Form Transaksi</li>
                     </ol>
                 </section>
 
@@ -32,31 +32,38 @@
                                             </div>
                                             <div id="collapseOne" class="panel-collapse collapse">
                                                 <div class="box-body">
-                                <form action="<?php echo site_url('admin/trxbengkel')?>" method="post">
+                                    <?php
+                                    foreach($dtrxs AS $dtrx){
+                                    ?>
+                                <form action="<?php echo site_url('admin/trxbengkelup')?>" method="post">
+                                    <a class="btn btn-success" href="<?=site_url('admin/unsetcust')?>"><i class="glyphicon glyphicon-plus"></i> Pilih Customer</a>
+                                         <br>
+                                         <br>
+                                         <br>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-xs-2">
                                                 <label>No Trans #</label>
-                                                <input class="form-control" type="text" name="id" value="" readonly>
+                                                <input class="form-control" type="text" name="id" value="<?=$KdTrx?>" readonly>
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Cara Bayar</label>
-                                                <select class="form-control" name="">
-                                                    <option value="1">TUNAI</option>
-                                                    <option value="2">HUTANG</option>
+                                                <select class="form-control" name="cara">
+                                                    <option value="TUNAI">TUNAI</option>
+                                                    <option value="HUTANG">HUTANG</option>
                                                 </select>
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Tgl Transaksi</label>
-                                                <input class="form-control" type="text" name="tgl" value="<?=date('Y-m-d');?>">
+                                                <input class="form-control" type="text" name="tgl" value="<?=$dtrx->tgl?>">
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Jatuh Tempo</label>
-                                                <input class="form-control" type="text" name="tgl_tempo" value="<?=date('Y-m-d');?>">
+                                                <input class="form-control" type="text" name="tgl_tempo" value="<?=$dtrx->tgl_tempo?>">
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Tgl Lunas</label>
-                                                <input class="form-control" type="text" name="tgl_lunas" value="<?=date('Y-m-d');?>">
+                                                <input class="form-control" type="text" name="tgl_lunas" value="<?=$dtrx->tgl_lunas?>">
                                             </div>
                                         </div>
                                     </div>
@@ -64,11 +71,11 @@
                                         <div class="row">
                                             <div class="col-xs-2">
                                                 <label>No Pol #</label>
-                                                <input class="form-control" type="text" name="nopol" value="">
+                                                <input class="form-control" type="text" name="nopol" value="<?=$dtrx->no_polisi?>" readonly>
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>KM Motor</label>
-                                                <input class="form-control" type="text" name="km" value="">
+                                                <input class="form-control" type="number" name="km" value="<?=$dtrx->km?>">
                                             </div>
                                         </div>
                                     </div>
@@ -77,11 +84,11 @@
                                         <div class="row">
                                             <div class="col-xs-5">
                                                 <label>Keluhan</label>
-                                                <textarea class="form-control" name="keluhan"></textarea>
+                                                <textarea class="form-control" name="keluhan"><?=$dtrx->keluhan?></textarea>
                                             </div>
                                             <div class="col-xs-5">
                                                 <label>Keterangan</label>
-                                                <textarea class="form-control" name="keterangan"></textarea>
+                                                <textarea class="form-control" name="keterangan"><?=$dtrx->keterangan?></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -92,6 +99,17 @@
                                                 <label>Mekanik</label>
                                                 <select class="form-control" name="id_mekanik">
                                                     <option value=""></option>
+                                                    <?php
+                                                    foreach($mekaniks AS $mekanik){
+                                                        $selected="";
+                                                        if($mekanik->nama){
+                                                            $selected = "selected";
+                                                        }
+                                                        ?>
+                                                        <option value="<?=$mekanik->karyawan_id?>" <?=$selected?>><?=$mekanik->nama?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -99,11 +117,13 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-xs-2">
-                                                <input class="btn btn-primary" type="submit" name="btnaddinfo" value="Submit" />
+                                                <input class="btn btn-success" type="submit" name="btnaddinfo" value="Submit" />
                                             </div>
                                         </div>
                                     </div>                                    
                                     </form>
+                                    <?php } ?>
+                                    
                                                 </div>
                                             </div>
                                         </div>

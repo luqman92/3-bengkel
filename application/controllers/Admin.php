@@ -19,6 +19,7 @@ class Admin extends CI_Controller {
 		$this->load->model('Kunjungan_model','kjg');
 		$this->load->model('PMB_model','pmb');
 		$this->load->model('Masterbarang_model','mb');
+		$this->load->model('Transaksi_model','trxl');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -156,10 +157,13 @@ class Admin extends CI_Controller {
             $row[] = $cstm->alamat;
             $row[] = $cstm->hp;
             
+            if($this->session->userdata('level')=='2'){
             //add html for action
             $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_customer('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
                   <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_customer('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
- 
+ 			}else{
+ 				$row[] = '<a class="btn btn-sm btn-primary" href="'.site_url('admin/trx_add/'.$cstm->customer_id).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a>';
+ 			}
             $data[] = $row;
         }
  
@@ -490,21 +494,185 @@ class Admin extends CI_Controller {
 -----------------------------------------------------KEUANGAN-------------------------------------------------------------
 */
 
-	public function trxbengkel()
-	{
-		if(empty($id)){
-		$btnaddinfo = $this->input->post('btnaddinfo');
-		if(!empty($btnaddinfo)){
-			echo "<pre>";
-				print_r($_POST);
-			echo "<pre>";
-		}else{
-		$this->template_admin->load('template_admin','Moduls/trxbengkel/index');
-			
-		}
 
+	public function trx_add($id)
+	{
+		$cust_id = $id;
+		$trx = "TRX".date('ymd').rand(100000,999999);
+		$datenow = date('Y-m-d H:i:s');
+
+    	$sess_data['trx_id'] = $trx;
+		$this->session->set_userdata($sess_data);
+
+		$data = array(
+			'customer_id' => $cust_id,
+			'id' => $trx,
+			'tgl' => $datenow,
+			);
+
+		$cbg = $this->session->userdata('cabang');
+    	$this->Model_admin->create_data($data,'transaksi');
+
+    	redirect('admin/trxbengkel/'.$trx);
+	}
+
+	public function trx_bkl($id)
+	{
+		$trx = $id;
+		
+    	$sess_data['trx_id'] = $trx;
+		$this->session->set_userdata($sess_data);
+
+		redirect('admin/trxbengkel/'.$trx);
+	}
+
+	public function trxlist()
+	{
+		$this->template_admin->load('template_admin','Moduls/trxlist/index');
+	}
+
+/*AJAX MasterBarang*/
+	public function ajax_list_trxl()
+    {
+    	//$cbg = $this->session->userdata('cabang');
+    	//$list = $this->mb->get_datatables($cbg);
+    	$list = $this->trxl->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $trxl) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $trxl->id;
+            $row[] = $trxl->cust;
+            $row[] = $trxl->no_polisi;
+            $row[] = $trxl->mekanik;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="'.site_url('admin/trx_bkl/'.$trxl->id).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a> <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxl('."'".$trxl->id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->trxl->count_all(),
+                        "recordsFiltered" => $this->trxl->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_trxl($id)
+    {
+        $data = $this->trxl->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_trxl()
+    {
+        $data = array(
+                'KodeBarang' => $this->input->post('KodeBarang'),
+                'NamaBarang' => $this->input->post('NamaBarang'),
+                'Satuan' => $this->input->post('Satuan'),
+                'HPP' => $this->input->post('HPP'),
+                'HargaJual' => $this->input->post('HargaJual'),
+            );
+        $insert = $this->trxl->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_trxl()
+    {
+        $data = array(
+                'NamaBarang' => $this->input->post('NamaBarang'),
+                'Satuan' => $this->input->post('Satuan'),
+                'HPP' => $this->input->post('HPP'),
+                'HargaJual' => $this->input->post('HargaJual'),
+            );
+        $this->trxl->update(array('KodeBarang' => $this->input->post('KodeBarang')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_trxl($id)
+    {
+        //$this->trxl->delete_by_id($id);
+        $data = array(
+                'status' => 'nullified',
+            );
+        $this->trxl->update(array('id' => $id), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX MasterBarang*/
+
+	public function trxbengkelup($id)
+	{
+		$id = $this->input->post('id');
+		$data =  array(
+			'cara' => $this->input->post('cara'),
+			'tgl' => $this->input->post('tgl'),
+			'tgl_tempo' => $this->input->post('tgl_tempo'),
+			'tgl_lunas' => $this->input->post('tgl_lunas'),
+			'km' => $this->input->post('km'),
+			'keluhan' => $this->input->post('keluhan'),
+			'keterangan' => $this->input->post('keterangan')
+			);
+		$where = array('id' => $id);
+		//$this->trx->update(array('id' => $this->input->post('id')), $data);
+		/*update_data($where,$data,$table)*/
+		$this->Model_admin->update_data($where,$data,'transaksi');
+		redirect('admin/trxbengkel/'.$id);
+	}
+
+	public function trxbengkel($id="")
+	{
+		$trx_id = $this->session->userdata('trx_id');
+		if(!empty($trx_id)){
+			$dtrx = $this->Model_admin->manualQuery('SELECT
+													a.id,
+													a.nopol,
+													a.customer_id,
+													a.km,
+													a.keluhan,
+													a.keluhan1,
+													a.id_mekanik,
+													a.mekanik,
+													a.waktu1,
+													a.waktu2,
+													a.keterangan,
+													a.nama_cust,
+													a.tipe_motor,
+													a.merek_motor,
+													a.pot_persen,
+													a.pot_nominal,
+													a.post,
+													a.tgl,
+													a.cara,
+													a.ket_cara,
+													a.cust,
+													a.tgl_tempo,
+													a.tgl_lunas,
+													b.no_polisi 
+												FROM
+													transaksi AS a
+													LEFT JOIN customer AS b ON a.customer_id = b.customer_id
+												WHERE id="'.$trx_id.'"')->result();
+			$mekanik = $this->Model_admin->manualQuery('SELECT * FROM karyawan WHERE id_jabatan="MK"')->result();
+			$data = array(
+				'KdTrx' => $trx_id,
+				'dtrxs' => $dtrx,
+				'mekaniks' => $mekanik,
+				);
+			$this->template_admin->load('template_admin','Moduls/trxbengkel/index',$data);
+			
 		}else{
-			$this->template_admin->load('template_admin','Moduls/trxbengkel/index');
+			redirect('admin/customer');
 		}
 	}
 
@@ -784,10 +952,10 @@ class Admin extends CI_Controller {
 			}
 		}
 	}
-	public function usetkjg()
+	public function unsetcust()
 	{
-		$this->session->unset_userdata('cstmid');
-		redirect('admin/kunjungan/');
+		$this->session->unset_userdata('trx_id');
+		redirect('admin/customer/');
 	}
 
 		/*AJAX TRX BENGKEL*/

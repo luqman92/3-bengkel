@@ -1,12 +1,12 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Data Master Barang
-                        <small>List Data Master Barang</small>
+                        Data List Transaksi
+                        <small>List Data Transaksi</small>
                     </h1>
                     <ol class="breadcrumb">
                         <li><a href="<?php echo base_url(); ?>index.php/admin"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li class="active">List Data Master Barang</li>
+                        <li class="active">List Data Transaksi</li>
                     </ol>
                 </section>
 
@@ -20,17 +20,16 @@
                                 </div><!-- /.box-header -->
                                 <div class="box-body table-responsive">
                                 <!-- <a class="btn btn-primary" href="<?php echo base_url() ?>admin/addmerk"><i class="fa fa-plus-circle"></i> Data Sparepart</a> -->
-                                 <button class="btn btn-success" onclick="add_masterbrg()"><i class="glyphicon glyphicon-plus"></i> Master Barang</button>
-                                <br><br>
+                                 <!-- <button class="btn btn-success" onclick="add_masterbrg()"><i class="glyphicon glyphicon-plus"></i> Master Barang</button>
+                                <br><br> -->
                                     <table id="table" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode Barang</th>
-                                                <th>Nama Barang</th>
-                                                <th>Satuan</th>
-                                                <th>Harga Pokok</th>
-                                                <th>Harga Jual</th>
+                                                <th>No Transaksi</th>
+                                                <th>Nama Customer</th>
+                                                <th>No Polisi</th>
+                                                <th>Mekanik</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -40,13 +39,11 @@
                                         <tfoot>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode Barang</th>
-                                                <th>Nama Barang</th>
-                                                <th>Satuan</th>
-                                                <th>Harga Pokok</th>
-                                                <th>Harga Jual</th>
-                                                <th>Action</th>
-                                                
+                                                <th>No Transaksi</th>
+                                                <th>Nama Customer</th>
+                                                <th>No Polisi</th>
+                                                <th>Mekanik</th>
+                                                <th>Action</th> 
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -73,7 +70,7 @@ $(document).ready(function() {
  
         // Load data for the table's content from an Ajax source
         "ajax": {
-            "url": "<?php echo site_url('admin/ajax_list_mb')?>",
+            "url": "<?php echo site_url('admin/ajax_list_trxl')?>",
             "type": "POST"
         },
  
@@ -87,21 +84,11 @@ $(document).ready(function() {
  
     });
  
-    //datepicker
-   /* $('.datepicker').datepicker({
-        autoclose: true,
-        format: "yyyy-mm-dd",
-        todayHighlight: true,
-        orientation: "top auto",
-        todayBtn: true,
-        todayHighlight: true,  
-    });*/
- 
 });
  
  
  
-function add_masterbrg()
+function add_delete_trxl()
 {
     save_method = 'add';
     $('#form')[0].reset(); // reset form on modals
@@ -111,7 +98,7 @@ function add_masterbrg()
     $('.modal-title').text('Add Master Barang'); // Set Title to Bootstrap modal title
 }
  
-function edit_masterbrg(id)
+function edit_delete_trxl(id)
 {
     save_method = 'update';
     $('#form')[0].reset(); // reset form on modals
@@ -120,7 +107,7 @@ function edit_masterbrg(id)
  
     //Ajax Load data from ajax
     $.ajax({
-        url : "<?php echo site_url('admin/ajax_edit_mb/')?>" + id,
+        url : "<?php echo site_url('admin/ajax_edit_trxl/')?>" + id,
         type: "GET",
         dataType: "JSON",
         success: function(data)
@@ -155,9 +142,9 @@ function save()
     var url;
  
     if(save_method == 'add') {
-        url = "<?php echo site_url('admin/ajax_add_mb')?>";
+        url = "<?php echo site_url('admin/ajax_add_trxl')?>";
     } else {
-        url = "<?php echo site_url('admin/ajax_update_mb')?>";
+        url = "<?php echo site_url('admin/ajax_update_trxl')?>";
     }
  
     // ajax adding data to database
@@ -190,13 +177,13 @@ function save()
     });
 }
  
-function delete_masterbrg(id)
+function delete_trxl(id)
 {
     if(confirm('Are you sure delete this data?'))
     {
         // ajax delete data to database
         $.ajax({
-            url : "<?php echo site_url('admin/ajax_delete_mb')?>/"+id,
+            url : "<?php echo site_url('admin/ajax_delete_trxl')?>/"+id,
             type: "POST",
             dataType: "JSON",
             success: function(data)
