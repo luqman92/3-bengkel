@@ -134,6 +134,31 @@
                     }elseif ($this->session->userdata('level') == '2') {
                        // data main menu
                         //$this->db->order_by('birth_date', 'ASC')->get_where($this->tbl_name, $where);
+                        $main_menu = $this->db->order_by('position', 'ASC')->get_where('menu', array('parent_id' => 0,'group_id' => 2,'active' => 'Y'));
+                        foreach ($main_menu->result() as $main) {
+                            // Query untuk mencari data sub menu
+                            $sub_menu = $this->db->order_by('position', 'ASC')->get_where('menu', array('parent_id' => $main->id));
+                            // periksa apakah ada sub menu
+                            if ($sub_menu->num_rows() > 0) {
+                                // main menu dengan sub menu
+                                echo "<li class='treeview'>" . anchor($main->url, '<i class="fa ' . $main->class . '"></i>' . $main->title .
+                                        '<span class="pull-right-container">
+                                                <i class="fa fa-angle-left pull-right"></i>
+                                            </span>');
+                                // sub menu nya disini
+                                echo "<ul class='treeview-menu'>";
+                                foreach ($sub_menu->result() as $sub) {
+                                    echo "<li>" . anchor($sub->url, '<i class="fa ' . $sub->class . '"></i>' . $sub->title) . "</li>";
+                                }
+                                echo"</ul></li>";
+                            } else {
+                                // main menu tanpa sub menu
+                                echo "<li>" . anchor($main->url, '<i class="fa ' . $main->class . '"></i>' . $main->title) . "</li>";
+                            }
+                        }
+                    }elseif ($this->session->userdata('level') == '3') {
+                       // data main menu
+                        //$this->db->order_by('birth_date', 'ASC')->get_where($this->tbl_name, $where);
                         $main_menu = $this->db->order_by('position', 'ASC')->get_where('menu', array('parent_id' => 0,'group_id' => 3,'active' => 'Y'));
                         foreach ($main_menu->result() as $main) {
                             // Query untuk mencari data sub menu

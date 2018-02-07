@@ -157,9 +157,9 @@ class Admin extends CI_Controller {
             $row[] = $cstm->alamat;
             $row[] = $cstm->hp;
             
-            if($this->session->userdata('level')=='2'){
+            if($this->session->userdata('level')=='1'){
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_customer('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_customer('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a> <a class="btn btn-sm btn-primary" href="'.site_url('admin/trx_add/'.$cstm->customer_id).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a>
                   <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_customer('."'".$cstm->customer_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  			}else{
  				$row[] = '<a class="btn btn-sm btn-primary" href="'.site_url('admin/trx_add/'.$cstm->customer_id).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a>';
@@ -188,13 +188,15 @@ class Admin extends CI_Controller {
     public function ajax_add_customer()
     {
     	$cbg = $this->session->userdata('cabang');
+    	$currdate = date('Y-m-d');
     	$data = array(
                 'no_polisi' => $this->input->post('no_polisi'),
                 'nama' => $this->input->post('nama'),
-                'tipe' => $this->input->post('tipe'),
+                'mtr_id' => $this->input->post('tipe'),
                 'alamat' => $this->input->post('alamat'),
                 'hp' => $this->input->post('hp'),
-                'cabang_id' => $this->input->post('cabang_id'),
+                'cabang_id' => $cbg,
+                'tanggal' => $currdate,
             );
         $insert = $this->cstm->save($data);
         header('Content-Type: application/json');
@@ -206,7 +208,7 @@ class Admin extends CI_Controller {
         $data = array(
                 'no_polisi' => $this->input->post('no_polisi'),
                 'nama' => $this->input->post('nama'),
-                'tipe' => $this->input->post('tipe'),
+                'mtr_id' => $this->input->post('tipe'),
                 'alamat' => $this->input->post('alamat'),
                 'hp' => $this->input->post('hp'),
             );
@@ -217,7 +219,13 @@ class Admin extends CI_Controller {
  
     public function ajax_delete_customer($id)
     {
-        $this->cstm->delete_by_id($id);
+    	$where = array(
+    		'customer_id'=>$id,);
+    	$data = array(
+    		'status'=>'nullified',
+    		);
+    	$this->Model_admin->update_data($where,$data,'customer');
+        //$this->cstm->delete_by_id($id);
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
@@ -393,6 +401,7 @@ class Admin extends CI_Controller {
                 'HargaJual' => $this->input->post('HargaJual'),
             );
         $insert = $this->mb->save($data);
+        $insertstok = $this->Model_admin->create_data($data,'stokbarang');
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
@@ -695,8 +704,7 @@ class Admin extends CI_Controller {
             $row[] = $trx->total;
  
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$trx->key."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$trx->key."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxl('."'".$trx->key."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  
             $data[] = $row;
         }
@@ -764,9 +772,16 @@ class Admin extends CI_Controller {
 
 	public function pembeliansparepart()
 	{
-		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		//$data['pemasukans'] = $this->Model_admin->manualQuery('SELECT * FROM pemasukan ORDER BY tgl DESC')->result();
-		$this->template_admin->load('template_admin','Moduls/pembeliansparepart/index');
+		$spp = $this->Model_admin->manualQuery('SELECT * FROM supplier')->result();
+		$no_pmb = "PB".rand(100000000,999999999)."-".date('dmy');
+    	$cbg = $this->session->userdata('cabang');
+
+		$data = array(
+			'spps'=>$spp,
+			'no_pmb'=>$no_pmb,
+			'cbg'=>$cbg,
+			);
+		$this->template_admin->load('template_admin','Moduls/pembeliansparepart/index',$data);
 	}
 
 	/*AJAX PEMASUKAN BENGKEL*/
@@ -780,17 +795,14 @@ class Admin extends CI_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $pmb->kode;
             $row[] = $pmb->tgl;
-            $row[] = $pmb->supplier;
-            $row[] = $pmb->diskripsi;
-            $row[] = $pmb->qty;
-            $row[] = $pmb->harga;
-            $row[] = $pmb->total;
-           
+            $row[] = $pmb->no_pmb;
+            $row[] = $pmb->nama;
+            
             //add html for action
-            /*$row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->key_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
+            $row[] = '<a class="btn btn-sm btn-success" href="'.site_url('admin/pmb_add/'.$pmb->no_pmb).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a>';
+                 /* $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
  
             $data[] = $row;
         }
@@ -815,28 +827,27 @@ class Admin extends CI_Controller {
  
     public function ajax_add_pmb()
     {
+    	$cbg = $this->session->userdata('cabang');
+    	$currdate = date('Y-m-d');
+        
         $data = array(
-                'firstName' => $this->input->post('firstName'),
-                'lastName' => $this->input->post('lastName'),
-                'gender' => $this->input->post('gender'),
-                'address' => $this->input->post('address'),
-                'dob' => $this->input->post('dob'),
-            );
-        $insert = $this->pmb->save($data);
+                'no_pmb' => $this->input->post('no_pmb'),
+                'SupplierId' => $this->input->post('SupplierId'),
+                'cabang_id' => $cbg,
+                'tgl' => $currdate,
+                );
+        $this->Model_admin->create_data($data,'pmb_sparepart');
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
  
     public function ajax_update_pmb()
     {
-        $data = array(
-                'firstName' => $this->input->post('firstName'),
-                'lastName' => $this->input->post('lastName'),
-                'gender' => $this->input->post('gender'),
-                'address' => $this->input->post('address'),
-                'dob' => $this->input->post('dob'),
-            );
-        $this->pmb->update(array('id' => $this->input->post('id')), $data);
+    	$data = array(
+                'no_pmb' => $this->input->post('no_pmb'),
+                'SupplierId' => $this->input->post('SupplierId'),
+                );
+        $this->Model_admin->create_data($data,'pmb_sparepart');
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
@@ -849,20 +860,64 @@ class Admin extends CI_Controller {
     }
 	/*AJAX PEMASUKAN BENGKEL*/
 
-	public function pmb_add()
+	public function pmb_add($id)
 	{
-		$spr = $this->Model_admin->manualQuery('SELECT * FROM sparepart')->result();
-		$sprpmb = $this->Model_admin->manualQuery('SELECT a.key_id,a.kode,b.diskripsi,a.harga,a.qty,a.diskon,a.total FROM sparepart_pmb AS a LEFT JOIN sparepart AS b ON b.kode = a.kode where kondisi="new"')->result();
-		$spps = $this->Model_admin->manualQuery('SELECT * FROM supplier')->result();
-
-		$no_pmb = "PB".rand(100000000,999999999)."-".date('dmy');
+		$NoTrx = $id;
+		$pmb_sp = $this->Model_admin->manualQuery('SELECT
+										a.no_pmb,
+										a.no_sj,
+										a.SupplierId,
+										a.supplier,
+										a.tgl,
+										a.tgl_tempo,
+										a.cara,
+										a.keterangan,
+										a.ppn,
+										a.diskon,
+										a.post,
+										a.ket_cara,
+										a.tgl_lunas,
+										a.cabang_id,
+										b.nama 
+									FROM
+										pmb_sparepart AS a
+										INNER JOIN supplier AS b ON a.SupplierId = b.supplier_id
+										WHERE a.no_pmb="'.$NoTrx.'"')->result();
+		$mstrbrg = $this->Model_admin->manualQuery('SELECT
+										a.KodeBarang,
+										a.KodeCabang,
+										a.NamaBarang,
+										a.Satuan,
+										a.HPP,
+										a.HargaJual,
+										b.StokAkhir
+										FROM
+										masterbarang AS a
+										INNER JOIN stokbarang AS b ON a.KodeBarang = b.KodeBarang
+										')->result();
 		$data = array(
-			'sprs' => $spr,
-			'sprpmbs' => $sprpmb,
-			'no_pmb' => $no_pmb,
-			'spps' => $spps,
+			'NoTrxs' => $NoTrx,
+			'pmb_sps' => $pmb_sp,
+			'mstrbrgs' => $mstrbrg,
 			);
 		$this->template_admin->load('template_admin','Moduls/pmb_add/index',$data);
+	}
+	function pmb_addup()
+	{
+		/*echo "<pre>";
+			print_r($_POST);
+		echo "</pre>";*/
+		$id = $this->input->post('id');
+		$where = array('no_pmb'=> $id);
+		$data = array(
+			'cara'=>$this->input->post('cara'),
+			'tgl'=>$this->input->post('tgl'),
+			'tgl_tempo'=>$this->input->post('tgl_tempo'),
+			'tgl_lunas'=>$this->input->post('tgl_lunas'),
+			'keterangan'=>$this->input->post('keterangan'),
+			);
+		$this->Model_admin->update_data($where,$data,'pmb_sparepart');
+		redirect('admin/pmb_add/'.$id);
 	}
 
 	public function pmb_del($id)
@@ -894,6 +949,12 @@ class Admin extends CI_Controller {
 
 		$this->Model_admin->create_data($data,'sparepart_pmb');
 		redirect('admin/pmb_add');
+	}
+	public function pmb_adds_act()
+	{
+		echo "<pre>";
+			print_r($_POST);
+		echo "</pre>";
 	}
 
 	public function biayaoperasional()

@@ -3,10 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Pmb_model extends CI_Model {
 
-	var $table = 'sparepart_pmb';
+	var $table = 'pmb_sparepart';
 	var $column_order = array('kode','diskripsi','qty','harga',null); //set column field database for datatable orderable
 	var $column_search = array('kode','diskripsi','qty'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('b.tgl' => 'desc'); // default order 
+	var $order = array('a.tgl' => 'desc'); // default order 
 
 	public function __construct()
 	{
@@ -25,15 +25,34 @@ class Pmb_model extends CI_Model {
 			$this->db->from($this->table);
 			$this->db->where('cabang_id', $id);
 		}*/
+		/*SELECT
+	a.no_pmb,
+	a.no_sj,
+	a.SupplierId,
+	a.supplier,
+	a.tgl,
+	a.tgl_tempo,
+	a.cara,
+	a.keterangan,
+	a.ppn,
+	a.diskon,
+	a.post,
+	a.ket_cara,
+	a.tgl_lunas,
+	a.cabang_id,
+	b.nama 
+FROM
+	pmb_sparepart AS a
+	INNER JOIN supplier AS b ON a.SupplierId = b.supplier_id*/
 		if($id==''){
-			$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
+			$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama');
 			$this->db->from($this->table.' AS a');
-			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb');
+			$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
         }else{
-        	$this->db->select('a.kode,a.diskripsi,a.qty,a.harga,a.key_id,a.total,b.supplier,b.tgl');
+        	$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama');
 			$this->db->from($this->table.' AS a');
-			$this->db->join('pmb_sparepart AS b', 'b.no_pmb=a.no_pmb','inner');
-			$this->db->where('b.cabang_id', $id);
+			$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
+			$this->db->where('a.cabang_id', $id);
         }
 		//$this->db->simple_query('SELECT * FROM '.$this->table);
 		$i = 0;
@@ -123,6 +142,10 @@ class Pmb_model extends CI_Model {
 	{
 		$this->db->insert($this->table, $data);
 		return $this->db->insert_id();
+	}
+
+	function create_data($data,$table){
+		$this->db->insert($table,$data);
 	}
 
 	public function update($where, $data)

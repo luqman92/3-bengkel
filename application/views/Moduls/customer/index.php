@@ -114,7 +114,7 @@ function edit_customer(id)
             $('[name="customer_id"]').val(data.customer_id);
             $('[name="no_polisi"]').val(data.no_polisi);
             $('[name="nama"]').val(data.nama);
-            $('[name="tipe"]').val(data.tipe);
+            $('[name="tipe"]').val(data.mtr_id);
             $('[name="alamat"]').val(data.alamat);
             $('[name="hp"]').val(data.hp);
             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded

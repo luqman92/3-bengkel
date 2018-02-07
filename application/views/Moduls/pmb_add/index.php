@@ -1,12 +1,13 @@
+          <!-- http://mbahcoding.com/tutorial/php/codeigniter/codeigniter-ajax-crud-using-bootstrap-modals-and-datatable.html -->
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Input Pembelian Sparepart
-                        <small>List Input Pembelian Sparepart</small>
+                        Form Transaksi
+                        <small></small>
                     </h1>
                     <ol class="breadcrumb">
                         <li><a href="<?php echo base_url(); ?>index.php/admin"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li class="active">List Input Pembelian Sparepart</li>
+                        <li class="active">List Form Transaksi</li>
                     </ol>
                 </section>
 
@@ -18,117 +19,139 @@
                                 <div class="box-header">
                                     <!-- <h3 class="box-title">Data Table With Full Features</h3> -->                                    
                                 </div><!-- /.box-header -->
-                                <div class="box-body">
-                                    <br><br>
-                                    <form action="<?=site_url('admin/pmb_add_act')?>" method="post">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Nama Barang</th>
-                                                <th>Jumlah</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                <div class="box-body table-responsive">
+                                <div class="box-group" id="accordion">
+                                        <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
+                                        <div class="panel box box-primary">
+                                            <div class="box-header">
+                                                <h4 class="box-title">
+                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                                                        Informasi Order
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                            <div id="collapseOne" class="panel-collapse collapse">
+                                                <div class="box-body">
+                                    <?php
+                                    foreach($pmb_sps AS $pmb_sp){
+                                    ?>
+                                <form action="<?php echo site_url('admin/pmb_addup')?>" method="post">
+                                    <!-- <a class="btn btn-success" href="<?=site_url('admin/unsetcust')?>"><i class="glyphicon glyphicon-plus"></i> Pilih Customer</a> -->
+                                         <br>
+                                         <br>
+                                         <br>
+                                    <div class="form-group">
                                         <div class="row">
-                                            <tr>
-                                                <td>
-                                                    <div class="col-xs-12">
-                                                    <select id="searchbrg" class="form-control" name="kode">
-                                                        <option value=""></option>    
-                                                        <?php
-                                                            foreach ($sprs as $spr) {
-                                                                ?>
-                                                                <option value="<?=$spr->kode?>"><?=$spr->diskripsi." | ".$spr->harga?></option>
-                                                                <?php
-                                                            }
-                                                        ?>
-                                                    </select>
-                                                    </div>
-                                                </td>
-                                                <td><div class="col-xs-12"><input class="form-control" name="qty"></div></td>
-                                                <td><div class="col-xs-12"><input class="btn btn-primary" type="submit" name="btn_addpmb" value="Tambah"></div></td>
-                                            </tr>
+                                            <div class="col-xs-2">
+                                                <label>No Trans #</label>
+                                                <input class="form-control" type="text" name="id" value="<?=$NoTrxs?>" readonly>
+                                            </div>
+                                            <div class="col-xs-2">
+                                                <label>Cara Bayar</label>
+                                                <select class="form-control" name="cara">
+                                                    <option value="TUNAI">TUNAI</option>
+                                                    <option value="HUTANG">HUTANG</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-xs-2">
+                                                <label>Tgl Transaksi</label>
+                                                <input class="form-control" type="text" name="tgl" value="<?=$pmb_sp->tgl?>">
+                                            </div>
+                                            <div class="col-xs-2">
+                                                <label>Jatuh Tempo</label>
+                                                <input class="form-control" type="text" name="tgl_tempo" value="<?=$pmb_sp->tgl_tempo?>">
+                                            </div>
+                                            <div class="col-xs-2">
+                                                <label>Tgl Lunas</label>
+                                                <input class="form-control" type="text" name="tgl_lunas" value="<?=$pmb_sp->tgl_lunas?>">
+                                            </div>
                                         </div>
-                                        </tbody>
-                                    </table>
-                                    </form>
+                                    </div>
 
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Kode Part</th>
-                                                <th>Diskripsi</th>
-                                                <th>@Harga</th>
-                                                <th>Qty</th>
-                                                <th>Pot(%)</th>
-                                                <th>Total Harga</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $totalx = '';
-                                            foreach ($sprpmbs as $sprpmb) {
-                                                $totalx = $totalx+$sprpmb->total;
-                                            ?>
-                                            <tr>
-                                                <td><?=$sprpmb->kode?></td>
-                                                <td><?=$sprpmb->diskripsi?></td>
-                                                <td><?=$sprpmb->harga?></td>
-                                                <td><?=$sprpmb->qty?></td>
-                                                <td><?=$sprpmb->diskon?></td>
-                                                <td><?="Rp. ".$sprpmb->total?></td>
-                                                <td><a href="<?=site_url('admin/pmb_del/'.$sprpmb->key_id)?>">Hapus</a></td>
-                                            </tr>
-                                            <?php
-                                            //$totalx++;
-                                            }
-                                            ?>
-                                            <tr>
-                                                <td colspan="5" style="text-align:right;"><b>Total Harga</b></td>
-                                                <td colspan="2"><b><?="Rp. ".$totalx;?></b></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <form action="<?=site_url('admin/')?>" method="post">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <td>Kode Pembelian Sparepart</td>
-                                                    <td><input class="form-control" value="<?=$no_pmb?>" readonly></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Tanggal</td>
-                                                    <td><input class="form-control" value="<?=date('Y-m-d');?>"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Supplier</td>
-                                                    <td>
-                                                        <select id="searchspp" class="form-control" name="">
-                                                            <option value=""></option>
-                                                            <?php
-                                                            foreach ($spps as $spp) {
-                                                                ?>
-                                                            <option value="<?=$spp->supplier_id?>"><?=$spp->nama?></option>
-                                                                <?php
-                                                            }
-                                                            ?>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2"><input class="btn btn-primary" type="submit" value="Simpan"></td>
-                                                </tr>
-                                            </thead>
-                                        </table>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-xs-2">
+                                                <label>Supplier</label>
+                                                <input class="form-control" type="text" name="nama" value="<?=$pmb_sp->nama?>" readonly>
+                                            </div>
+                                            <div class="col-xs-8">
+                                                <label>Keterangan</label>
+                                                <textarea class="form-control" name="keterangan"><?=$pmb_sp->keterangan?></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-xs-2">
+                                                <input class="btn btn-success" type="submit" name="" value="Submit" />
+                                            </div>
+                                        </div>
+                                    </div>                                    
                                     </form>
+                                    <?php } ?>
+                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel box box-danger">
+                                            <div class="box-header">
+                                                <h4 class="box-title">
+                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                                                        Detail Order
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                            <div id="collapseTwo" class="panel-collapse collapse in">
+                                                <div class="box-body">
+                                                <button class="btn btn-success" onclick="add_person()"><i class="glyphicon glyphicon-plus"></i> Pembelian Barang</button>
+                                                <button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
+                                                <br />
+                                                <br />
+                                                    <table id="tables" class="table table-bordered table-striped" cellspacing="0" width="100%">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>No</th>
+                                                                <th>Kode</th>
+                                                                <th>Jenis</th>
+                                                                <th>Keterangan</th>
+                                                                <th>@Harga (Rp)</th>
+                                                                <th>Qty</th>
+                                                                <th>Pot (%)</th>
+                                                                <th>Jumlah (Rp)</th>
+                                                                <th>Action</th>
+
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <th>No</th>
+                                                                <th>Kode</th>
+                                                                <th>Jenis</th>
+                                                                <th>Keterangan</th>
+                                                                <th>@Harga (Rp)</th>
+                                                                <th>Qty</th>
+                                                                <th>Pot (%)</th>
+                                                                <th>Jumlah (Rp)</th>
+                                                                <th>Action</th>
+                                                                
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div><!-- /.box-body -->
                             </div><!-- /.box -->
                         </div>
                     </div>
                 </section>
+
+
 <script>
     $(document).ready(function(){
        $("#searchbrg").select2({
@@ -139,12 +162,45 @@
        }); 
     });
 </script>
-<!-- SCRIPT -->
+
 <script type="text/javascript">
+ 
+var tables;
+ 
+$(document).ready(function() {
+ 
+    //datatables
+    tables = $('#tables').DataTable({ 
+ 
+        "processing": true, //Feature control the processing indicator.
+        "serverSide": true, //Feature control DataTables' server-side processing mode.
+        "order": [], //Initial no order.
+ 
+        // Load data for the table's content from an Ajax source
+        "ajax": {
+            "url": "<?php echo site_url('admin/ajax_list_trxbengkel')?>",
+            "type": "POST"
+        },
+ 
+        //Set column definition initialisation properties.
+        "columnDefs": [
+        { 
+            "targets": [ 0 ], //first column / numbering column
+            "orderable": false, //set not orderable
+        },
+        ],
+ 
+    });
+ 
+});
+</script>
+        <!-- SCRIPT -->
+<script type="text/javascript">
+ 
 var save_method; //for save method string
 var table;
  
-$(document).ready(function() {
+jQuery(document).ready(function() {
  
     //datatables
     table = $('#table').DataTable({ 
@@ -155,7 +211,7 @@ $(document).ready(function() {
  
         // Load data for the table's content from an Ajax source
         "ajax": {
-            "url": "<?php echo site_url('admin/ajax_list_pmb')?>",
+            "url": "<?php echo site_url('admin/ajax_list_trxbengkel')?>",
             "type": "POST"
         },
  
@@ -202,7 +258,7 @@ function edit_person(id)
  
     //Ajax Load data from ajax
     $.ajax({
-        url : "<?php echo site_url('admin/ajax_edit_pmb/')?>/" + id,
+        url : "<?php echo site_url('admin/ajax_edit_trxbengkel/')?>/" + id,
         type: "GET",
         dataType: "JSON",
         success: function(data)
@@ -240,9 +296,9 @@ function save()
     var url;
  
     if(save_method == 'add') {
-        url = "<?php echo site_url('admin/ajax_add_pmb')?>";
+        url = "<?php echo site_url('admin/ajax_add_trxbengkel')?>";
     } else {
-        url = "<?php echo site_url('admin/ajax_update_pmb')?>";
+        url = "<?php echo site_url('admin/ajax_update_trxbengkel')?>";
     }
  
     // ajax adding data to database
@@ -281,7 +337,7 @@ function delete_person(id)
     {
         // ajax delete data to database
         $.ajax({
-            url : "<?php echo site_url('admin/ajax_delete_pmb')?>/"+id,
+            url : "<?php echo site_url('admin/ajax_delete_trxbengkel')?>/"+id,
             type: "POST",
             dataType: "JSON",
             success: function(data)
@@ -302,53 +358,38 @@ function delete_person(id)
 </script>
  
 <!-- Bootstrap modal -->
-<div class="modal fade" id="modal_form" role="dialog">
+<div class="modal fade" tabindex="-1" id="modal_form" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title">Person Form</h3>
+                <h3 class="modal-title">Barang Form</h3>
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="id"/> 
                     <div class="form-body">
                         <div class="form-group">
-                            <label class="control-label col-md-3">First Name</label>
+                            <label class="control-label col-md-3">Barang</label>
                             <div class="col-md-9">
-                                <input name="firstName" placeholder="First Name" class="form-control" type="text">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Last Name</label>
-                            <div class="col-md-9">
-                                <input name="lastName" placeholder="Last Name" class="form-control" type="text">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Gender</label>
-                            <div class="col-md-9">
-                                <select name="gender" class="form-control">
-                                    <option value="">--Select Gender--</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
+                                <select name="gender" class="form-control" id="searchbrg">
+                                    <option value="">--Select Barang--</option>
+                                    <?php
+                                    foreach ($mstrbrgs as $mstrbrg) {
+                                       ?>  
+                                       <option value="<?=$mstrbrg->KodeBarang?>"><?=$mstrbrg->NamaBarang?></option>
+                                       <?php
+                                    }
+                                    ?>
                                 </select>
                                 <span class="help-block"></span>
-                            </div>
+                            </div>  
                         </div>
+                        
                         <div class="form-group">
-                            <label class="control-label col-md-3">Address</label>
+                            <label class="control-label col-md-3">Jumlah</label>
                             <div class="col-md-9">
-                                <textarea name="address" placeholder="Address" class="form-control"></textarea>
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Date of Birth</label>
-                            <div class="col-md-9">
-                                <input name="dob" placeholder="yyyy-mm-dd" class="form-control datepicker" type="text">
+                                <input name="dob" placeholder="" class="form-control datepicker" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>

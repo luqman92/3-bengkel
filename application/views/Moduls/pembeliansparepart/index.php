@@ -19,19 +19,16 @@
                                     <!-- <h3 class="box-title">Data Table With Full Features</h3> -->                                    
                                 </div><!-- /.box-header -->
                                 <div class="box-body table-responsive">
-                                <a class="btn btn-primary" href="<?php echo base_url() ?>admin/pmb_add"><i class="fa fa-plus-circle"></i> Pembelian Sparepart</a>
+                                <button class="btn btn-success" onclick="add_pmb_sparepart()"><i class="glyphicon glyphicon-plus"></i> Pembelian Sparepart</button>
                                 <br><br>
                                     <table id="table" class="table table-bordered table-striped" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode</th>
                                                 <th>Tanggal</th>
+                                                <th>No Transaksi</th>
                                                 <th>Supplier</th>
-                                                <th>Diskripsi</th>
-                                                <th>qty</th>
-                                                <th>Harga</th>
-                                                <th>Total Harga</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -40,13 +37,10 @@
                                         <tfoot>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode</th>
                                                 <th>Tanggal</th>
+                                                <th>No Transaksi</th>
                                                 <th>Supplier</th>
-                                                <th>Diskripsi</th>
-                                                <th>qty</th>
-                                                <th>Harga</th>
-                                                <th>Total Harga</th>
+                                                <th>Action</th>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -101,7 +95,7 @@ $(document).ready(function() {
  
  
  
-function add_person()
+function add_pmb_sparepart()
 {
     save_method = 'add';
     $('#form')[0].reset(); // reset form on modals
@@ -111,7 +105,7 @@ function add_person()
     $('.modal-title').text('Add Person'); // Set Title to Bootstrap modal title
 }
  
-function edit_person(id)
+function edit_pmb_sparepart(id)
 {
     save_method = 'update';
     $('#form')[0].reset(); // reset form on modals
@@ -193,7 +187,7 @@ function save()
     });
 }
  
-function delete_person(id)
+function delete_pmb_sparepart(id)
 {
     if(confirm('Are you sure delete this data?'))
     {
@@ -229,44 +223,28 @@ function delete_person(id)
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
-                    <input type="hidden" value="" name="id"/> 
+                    <input type="hidden" value="" name="no_pmb"/> 
                     <div class="form-body">
                         <div class="form-group">
-                            <label class="control-label col-md-3">First Name</label>
+                            <label class="control-label col-md-3">No Transaksi</label>
                             <div class="col-md-9">
-                                <input name="firstName" placeholder="First Name" class="form-control" type="text">
+                                <input name="no_pmb" placeholder="First Name" class="form-control" type="text" value="<?=$no_pmb?>" readonly>
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Last Name</label>
+                            <label class="control-label col-md-3">Supplier</label>
                             <div class="col-md-9">
-                                <input name="lastName" placeholder="Last Name" class="form-control" type="text">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Gender</label>
-                            <div class="col-md-9">
-                                <select name="gender" class="form-control">
-                                    <option value="">--Select Gender--</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
+                                <select name="SupplierId" class="form-control">
+                                    <option value="">--Select Supplier--</option>
+                                    <?php
+                                    foreach($spps AS $spp){
+                                        ?>
+                                        <option value="<?=$spp->supplier_id?>"><?=$spp->nama?></option>
+                                        <?php
+                                    }
+                                    ?>
                                 </select>
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Address</label>
-                            <div class="col-md-9">
-                                <textarea name="address" placeholder="Address" class="form-control"></textarea>
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Date of Birth</label>
-                            <div class="col-md-9">
-                                <input name="dob" placeholder="yyyy-mm-dd" class="form-control datepicker" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>

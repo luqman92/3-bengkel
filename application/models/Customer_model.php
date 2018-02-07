@@ -24,6 +24,7 @@ class Customer_model extends CI_Model {
 			$this->db->select('*');
 			$this->db->from($this->table);
 			$this->db->where('cabang_id', $id);
+			$this->db->where('status', 'normal');
 		}
 		
 		//$this->db->simple_query('SELECT * FROM customer');

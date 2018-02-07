@@ -16,6 +16,7 @@ class Model_trxbengkel extends CI_Model {
  
     private function _get_datatables_query()
     {
+        /*SELECT a.key_id,a.kode,b.diskripsi,a.harga,a.qty,a.diskon,a.total FROM sparepart_pmb AS a LEFT JOIN sparepart AS b ON b.kode = a.kode where kondisi="new"*/
         $this->db->select('*');    
         $this->db->from($this->table);
         $this->db->join('sparepart', 'sparepart.kode='.$this->table.'.kode');
