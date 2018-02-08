@@ -21,6 +21,7 @@ class Admin extends CI_Controller {
 		$this->load->model('Masterbarang_model','mb');
 		$this->load->model('Transaksi_model','trxl');
 		$this->load->model('Mutasibarang_model','mtb');
+		$this->load->model('Stokbrg_model','stk');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -429,6 +430,96 @@ class Admin extends CI_Controller {
     public function ajax_delete_mb($id)
     {
         $this->mb->delete_by_id($id);
+        $where = array('KodeBarang'=> $id);
+        $this->Model_admin->del_data($where,'stokbarang');
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX MasterBarang*/
+
+	public function stokbarang()
+	{
+		$this->template_admin->load('template_admin','Moduls/stokbarang/index');
+	}
+
+/*AJAX MasterBarang*/
+	public function ajax_list_st()
+    {
+    	//$cbg = $this->session->userdata('cabang');
+    	//$list = $this->mb->get_datatables($cbg);
+    	$list = $this->stk->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $stk) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $stk->KodeBarang;
+            $row[] = $stk->NamaBarang;
+            $row[] = $stk->StokAkhir;
+            
+            //add html for action
+            /*$row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_masterbrg('."'".$mb->KodeBarang."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_masterbrg('."'".$mb->KodeBarang."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->stk->count_all(),
+                        "recordsFiltered" => $this->stk->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_st($id)
+    {
+        $data = $this->stk->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_st()
+    {
+    	$KodeCabang = $this->session->userdata('cabang');
+        $data = array(
+                'KodeBarang' => $this->input->post('KodeBarang'),
+                'NamaBarang' => $this->input->post('NamaBarang'),
+                'Satuan' => $this->input->post('Satuan'),
+                'HPP' => $this->input->post('HPP'),
+                'HargaJual' => $this->input->post('HargaJual'),
+                'KodeCabang' => $KodeCabang,
+            );
+        $datast = array(
+        	'KodeBarang' => $this->input->post('KodeBarang'),
+        	'StokAkhir' => '0',
+		);
+        $insert = $this->stk->save($data);
+        $insertstok = $this->Model_admin->create_data($datast,'stokbarang');
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_st()
+    {
+        $data = array(
+                'NamaBarang' => $this->input->post('NamaBarang'),
+                'Satuan' => $this->input->post('Satuan'),
+                'HPP' => $this->input->post('HPP'),
+                'HargaJual' => $this->input->post('HargaJual'),
+            );
+        $this->stk->update(array('KodeBarang' => $this->input->post('KodeBarang')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_st($id)
+    {
+        $this->stk->delete_by_id($id);
         $where = array('KodeBarang'=> $id);
         $this->Model_admin->del_data($where,'stokbarang');
         header('Content-Type: application/json');

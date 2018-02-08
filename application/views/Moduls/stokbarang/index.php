@@ -1,12 +1,12 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Data Master Barang
-                        <small>List Data Master Barang</small>
+                        Data Stok Barang
+                        <small>List Data Stok Barang</small>
                     </h1>
                     <ol class="breadcrumb">
                         <li><a href="<?php echo base_url(); ?>index.php/admin"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li class="active">List Data Master Barang</li>
+                        <li class="active">List Data Stok Barang</li>
                     </ol>
                 </section>
 
@@ -68,7 +68,7 @@ $(document).ready(function() {
  
         // Load data for the table's content from an Ajax source
         "ajax": {
-            "url": "<?php echo site_url('admin/ajax_list_sb')?>",
+            "url": "<?php echo site_url('admin/ajax_list_st')?>",
             "type": "POST"
         },
  
