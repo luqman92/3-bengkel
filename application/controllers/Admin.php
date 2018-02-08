@@ -394,15 +394,21 @@ class Admin extends CI_Controller {
  
     public function ajax_add_mb()
     {
+    	$KodeCabang = $this->session->userdata('cabang');
         $data = array(
                 'KodeBarang' => $this->input->post('KodeBarang'),
                 'NamaBarang' => $this->input->post('NamaBarang'),
                 'Satuan' => $this->input->post('Satuan'),
                 'HPP' => $this->input->post('HPP'),
                 'HargaJual' => $this->input->post('HargaJual'),
+                'KodeCabang' => $KodeCabang,
             );
+        $datast = array(
+        	'KodeBarang' => $this->input->post('KodeBarang'),
+        	'StokAkhir' => '0',
+		);
         $insert = $this->mb->save($data);
-        $insertstok = $this->Model_admin->create_data($data,'stokbarang');
+        $insertstok = $this->Model_admin->create_data($datast,'stokbarang');
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
@@ -423,6 +429,8 @@ class Admin extends CI_Controller {
     public function ajax_delete_mb($id)
     {
         $this->mb->delete_by_id($id);
+        $where = array('KodeBarang'=> $id);
+        $this->Model_admin->del_data($where,'stokbarang');
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
