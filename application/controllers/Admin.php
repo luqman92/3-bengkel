@@ -20,6 +20,7 @@ class Admin extends CI_Controller {
 		$this->load->model('PMB_model','pmb');
 		$this->load->model('Masterbarang_model','mb');
 		$this->load->model('Transaksi_model','trxl');
+		$this->load->model('Mutasibarang_model','mtb');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -773,7 +774,7 @@ class Admin extends CI_Controller {
 	public function pembeliansparepart()
 	{
 		$spp = $this->Model_admin->manualQuery('SELECT * FROM supplier')->result();
-		$no_pmb = "PB".rand(100000000,999999999)."-".date('dmy');
+		$no_pmb = "TRX".date('ymd').rand(100000,999999);
     	$cbg = $this->session->userdata('cabang');
 
 		$data = array(
@@ -800,9 +801,11 @@ class Admin extends CI_Controller {
             $row[] = $pmb->nama;
             
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-success" href="'.site_url('admin/pmb_add/'.$pmb->no_pmb).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a>';
-                 /* $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
+                if($pmb->status == 'final'){
+                	$row[] = '<a class="btn btn-sm btn-success" href="#" title="Transaksi"><i class="glyphicon glyphicon-print"></i> Cetak</a>';
+                }else{
+                	$row[] = '<a class="btn btn-sm btn-success" href="'.site_url('admin/pmb_add/'.$pmb->no_pmb).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a> <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_pmb_sparepart('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+                }
  
             $data[] = $row;
         }
@@ -902,6 +905,92 @@ class Admin extends CI_Controller {
 			);
 		$this->template_admin->load('template_admin','Moduls/pmb_add/index',$data);
 	}
+
+	/*AJAX PEMASUKAN BENGKEL*/
+	public function ajax_list_pmba()
+    {
+    	$cbg = $this->session->userdata('cabang');
+		$list = $this->mtb->get_datatables($cbg);
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $mtb) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $mtb->KodeBarang;
+            //$row[] = '';
+            $row[] = $mtb->NamaBarang;
+            $row[] = $mtb->HargaJual;
+            $row[] = $mtb->Masuk;
+            //$row[] = '';
+            $row[] = $mtb->HargaJual*$mtb->Masuk;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_barang('."'".$mtb->KeyId."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+                 /* $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->mtb->count_all($cbg),
+                        "recordsFiltered" => $this->mtb->count_filtered($cbg),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_pmba($id)
+    {
+        $data = $this->mtb->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_pmba()
+    {
+    	$iduser = $this->session->userdata('iduser');
+    	$cbg = $this->session->userdata('cabang');
+    	$currdate = date('Y-m-d');
+        
+        $data = array(
+                'KodeBarang' => $this->input->post('KodeBarang'),
+                'NomorTransaksi' => $this->input->post('NomorTransaksi'),
+                'SupplierId' => $this->input->post('SupplierId'),
+                'Masuk' => $this->input->post('Masuk'),
+                'UserId' => $iduser,
+                'TanggalTransaksi' => $currdate,
+                'Status' => 'new',
+                'JenisTransaksi' => '1',
+                );
+        $this->Model_admin->create_data($data,'mutasibarang');
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_pmba()
+    {
+    	$data = array(
+                'no_pmb' => $this->input->post('no_pmb'),
+                'SupplierId' => $this->input->post('SupplierId'),
+                );
+        $this->Model_admin->create_data($data,'pmb_sparepart');
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_pmba($id)
+    {
+        $this->mtb->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX PEMASUKAN BENGKEL*/
+
 	function pmb_addup()
 	{
 		/*echo "<pre>";
@@ -924,7 +1013,7 @@ class Admin extends CI_Controller {
 	{
 		$where = array('key_id'=>$id);
     	
-    	$this->Model_admin->del_data($where,'sparepart_pmb');
+    	$this->Model_admin->del_data($where,'mutasibarang');
 		redirect('admin/pmb_add');
 	}
 
@@ -950,11 +1039,28 @@ class Admin extends CI_Controller {
 		$this->Model_admin->create_data($data,'sparepart_pmb');
 		redirect('admin/pmb_add');
 	}
-	public function pmb_adds_act()
+	public function add_pmba_act()
 	{
-		echo "<pre>";
+		/*echo "<pre>";
 			print_r($_POST);
-		echo "</pre>";
+		echo "</pre>";*/
+		$NomorTransaksi = $this->input->post('NomorTransaksi');
+		$mutasibarang = $this->Model_admin->manualQuery('SELECT * FROM mutasibarang WHERE NomorTransaksi="'.$NomorTransaksi.'"')->result();
+		foreach ($mutasibarang as $data) {
+			$NomorTransaksi = $data->NomorTransaksi;
+			$KeyId = $data->KeyId;
+			$KodeBarang = $data->KodeBarang;
+			$Masuk = $data->Masuk;
+			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir+"'.$Masuk.'" WHERE KodeBarang="'.$KodeBarang.'"');
+
+			$data = array(
+				'KeyId'=>$KeyId,
+				);
+			$update = $this->Model_admin->manualQuery('UPDATE mutasibarang SET status="normal" WHERE NomorTransaksi="'.$NomorTransaksi.'"');
+			$update2 = $this->Model_admin->manualQuery('UPDATE pmb_sparepart SET status="final" WHERE no_pmb="'.$NomorTransaksi.'"');
+		}
+		
+	redirect('admin/pembeliansparepart');
 	}
 
 	public function biayaoperasional()

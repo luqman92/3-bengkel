@@ -45,11 +45,11 @@ FROM
 	pmb_sparepart AS a
 	INNER JOIN supplier AS b ON a.SupplierId = b.supplier_id*/
 		if($id==''){
-			$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama');
+			$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama,a.status');
 			$this->db->from($this->table.' AS a');
 			$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
         }else{
-        	$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama');
+        	$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama,a.status');
 			$this->db->from($this->table.' AS a');
 			$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
 			$this->db->where('a.cabang_id', $id);
@@ -132,7 +132,7 @@ FROM
 	public function get_by_id($id)
 	{
 		$this->db->from($this->table);
-		$this->db->where('customer_id',$id);
+		$this->db->where('no_pmb',$id);
 		$query = $this->db->get();
 
 		return $query->row();
@@ -156,7 +156,7 @@ FROM
 
 	public function delete_by_id($id)
 	{
-		$this->db->where('customer_id', $id);
+		$this->db->where('no_pmb', $id);
 		$this->db->delete($this->table);
 	}
 

@@ -22,7 +22,8 @@
         <!--<link href="<?php echo base_url(); ?>assets/css/datatables/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />-->
         <link href="<?php echo base_url('assets/datatables/css/dataTables.bootstrap.css')?>" rel="stylesheet">
         <link href="<?php echo base_url('assets/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')?>" rel="stylesheet">
-        <link href="<?php echo base_url('assets/css/select2.min.css')?>" rel="stylesheet">
+        <!-- <link href="<?php echo base_url('assets/css/select2.min.css')?>" rel="stylesheet"> -->
+        <link href="<?php echo base_url('assets/css/select2.css')?>" rel="stylesheet">
 
         <!-- <link href="<?php echo base_url('assets/bootstrap/css/bootstrap.min.css')?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/datatables/css/dataTables.bootstrap.css')?>" rel="stylesheet">
@@ -215,7 +216,7 @@
 
         <!-- daterangepicker -->
         <script src="<?php echo base_url(); ?>assets/js/plugins/daterangepicker/daterangepicker.js" type="text/javascript"></script>
-        <script src="<?php echo base_url(); ?>assets/js/select2.min.js" type="text/javascript"></script>
+        <script src="<?php echo base_url(); ?>assets/js/select2.js" type="text/javascript"></script>
         <!--<script src="<?php echo base_url(); ?>assets/js/bootstrap-datepicker.js" type="text/javascript"></script>-->
         <!--<script type="text/javascript">
             $(document).ready(function(){

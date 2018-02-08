@@ -169,7 +169,16 @@ function save()
             if(data.status) //if success close modal and reload ajax table
             {
                 $('#modal_form').modal('hide');
+                document.location.reload();
                 reload_table();
+    $('#modal_form').on('shown.bs.modal', function () {
+      $('#myInput').focus()
+    })
+    $('#modal_form').on('hidden.bs.modal', function () {
+      document.location.reload();
+
+    })
+
             }
  
             $('#btnSave').text('save'); //change button text
