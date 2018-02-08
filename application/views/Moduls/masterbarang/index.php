@@ -173,6 +173,7 @@ function save()
             {
                 $('#modal_form').modal('hide');
                 reload_table();
+                document.location.reload();
             }
  
             $('#btnSave').text('save'); //change button text
