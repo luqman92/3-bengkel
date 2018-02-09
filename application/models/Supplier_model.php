@@ -6,7 +6,7 @@ class Supplier_model extends CI_Model {
 	var $table = 'supplier';
 	var $column_order = array('nama','alamat','kota','tlp','fax','email',null); //set column field database for datatable orderable
 	var $column_search = array('nama','alamat','kota','tlp','fax','email'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('supplier_id' => 'desc'); // default order 
+	var $order = array('a.supplier_id' => 'desc'); // default order 
 
 	public function __construct()
 	{
@@ -17,16 +17,16 @@ class Supplier_model extends CI_Model {
 	private function _get_datatables_query($id="")
 	{
 		
-		if($id==''){
-			$this->db->select('*');
-			$this->db->from($this->table);
-		}else{
-			$this->db->select('*');
-			$this->db->from($this->table);
-			$this->db->where('KodeCabang', $id);
-		}
+		/*SELECT
+a.supplier_id,a.KodeCabang,a.kode,a.nama,a.alamat,a.kota_id,a.tlp,a.fax,a.email,b.kota
+FROM
+supplier AS a
+INNER JOIN kota AS b ON a.kota_id = b.kota_id
+*/
+			$this->db->select('a.supplier_id,a.KodeCabang,a.kode,a.nama,a.alamat,a.kota_id,a.tlp,a.fax,a.email,b.kota');
+			$this->db->from($this->table.' AS a');
+			$this->db->join('kota AS b', 'b.kota_id=a.kota_id','left');
 		
-		//$this->db->simple_query('SELECT * FROM customer');
 		$i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 

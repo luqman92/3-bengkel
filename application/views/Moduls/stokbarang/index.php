@@ -27,6 +27,7 @@
                                                 <th>No</th>
                                                 <th>Kode Barang</th>
                                                 <th>Nama Barang</th>
+                                                <th>Harga Jual</th>
                                                 <th>Stok</th>
                                                 
                                             </tr>
@@ -39,6 +40,7 @@
                                                 <th>No</th>
                                                 <th>Kode Barang</th>
                                                 <th>Nama Barang</th>
+                                                <th>Harga Jual</th>
                                                 <th>Stok</th>
                                                 
                                                 

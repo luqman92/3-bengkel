@@ -22,6 +22,7 @@ class Admin extends CI_Controller {
 		$this->load->model('Transaksi_model','trxl');
 		$this->load->model('Mutasibarang_model','mtb');
 		$this->load->model('Stokbrg_model','stk');
+		$this->load->model('Supplier_model','spp');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -118,10 +119,94 @@ class Admin extends CI_Controller {
 
 		public function suplier()
 	{
-		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		$data['suppliers'] = $this->Model_admin->manualQuery('SELECT * FROM supplier')->result();
+		$data['kotas'] = $this->Model_admin->manualQuery('SELECT * FROM kota')->result();
 		$this->template_admin->load('template_admin','Moduls/supplier/index',$data);
 	}
+
+	/*AJAX Customer*/
+	public function ajax_list_suplier()
+    {
+    	$cbg = $this->session->userdata('cabang');
+    	$list = $this->spp->get_datatables($cbg);
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $spp) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $spp->nama;
+            $row[] = $spp->alamat;
+            $row[] = $spp->tlp;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_suplier('."'".$spp->supplier_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a> <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_suplier('."'".$spp->supplier_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 			
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->spp->count_all(),
+                        "recordsFiltered" => $this->spp->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_suplier($id)
+    {
+        $data = $this->spp->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_suplier()
+    {
+    	$cbg = $this->session->userdata('cabang');
+    	$currdate = date('Y-m-d');
+    	$data = array(
+                'nama' => $this->input->post('nama'),
+                'alamat' => $this->input->post('alamat'),
+                'kota_id' => $this->input->post('kota_id'),
+                'tlp' => $this->input->post('tlp'),
+                'fax' => $this->input->post('fax'),
+                'email' => $this->input->post('email'),
+                );
+        $insert = $this->spp->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_suplier()
+    {
+        $data = array(
+                'nama' => $this->input->post('nama'),
+                'alamat' => $this->input->post('alamat'),
+                'kota_id' => $this->input->post('kota_id'),
+                'tlp' => $this->input->post('tlp'),
+                'fax' => $this->input->post('fax'),
+                'email' => $this->input->post('email'),
+            );
+        $this->spp->update(array('supplier_id' => $this->input->post('supplier_id')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_suplier($id)
+    {
+    	$where = array(
+    		'supplier_id'=>$id,);
+    	$data = array(
+    		'status'=>'nullified',
+    		);
+    	$this->Model_admin->update_data($where,$data,'customer');
+        //$this->spp->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX Customer*/
 
 		public function customer()
 	{
@@ -456,6 +541,7 @@ class Admin extends CI_Controller {
             $row[] = $no;
             $row[] = $stk->KodeBarang;
             $row[] = $stk->NamaBarang;
+            $row[] = $stk->HargaJual;
             $row[] = $stk->StokAkhir;
             
             //add html for action

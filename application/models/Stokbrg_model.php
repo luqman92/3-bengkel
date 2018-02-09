@@ -25,7 +25,7 @@ class Stokbrg_model extends CI_Model {
 			$this->db->from($this->table);
 			$this->db->where('cabang_id', $id);
 		}*/
-			$this->db->select('a.KodeBarang,b.NamaBarang,a.StokAkhir');
+			$this->db->select('a.KodeBarang,b.NamaBarang,a.StokAkhir,b.HargaJual');
 			$this->db->from($this->table.' AS a');
 			$this->db->join('masterbarang AS b', 'b.KodeBarang=a.KodeBarang');
         $i = 0;
