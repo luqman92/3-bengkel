@@ -396,12 +396,7 @@ function delete_barang(id)
                                     }
                                     ?>
                                 </select>
-                                <!-- <select class="js-example-basic-single" name="state">
-                                  <option value="AL">Alabama</option>
-                                    ...
-                                  <option value="WY">Wyoming</option>
-                                </select> -->
-                                <span class="help-block"></span>
+                                
                             </div>  
                         </div>
                         

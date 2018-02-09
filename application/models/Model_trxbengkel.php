@@ -3,10 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  
 class Model_trxbengkel extends CI_Model {
     
-    var $table = 'detil_transaksi';
-    var $column_order = array(null,'kode','jenis','keterangan','harga','qty','pot','total'); //set column field database for datatable orderable
+    var $table = 'mutasibarang';
+    var $column_order = array(null,'KodeBarang','NamaBarang','HargaJual','NomorTransaksi','qty','pot','total'); //set column field database for datatable orderable
     var $column_search = array('kode','jenis','keterangan'); //set column field database for datatable searchable just kode , jenis , address are searchable
-    var $order = array('id' => 'desc'); // default order 
+    var $order = array('a.KodeBarang' => 'desc'); // default order 
  
     public function __construct()
     {
@@ -16,12 +16,12 @@ class Model_trxbengkel extends CI_Model {
  
     private function _get_datatables_query()
     {
-        /*SELECT a.key_id,a.kode,b.diskripsi,a.harga,a.qty,a.diskon,a.total FROM sparepart_pmb AS a LEFT JOIN sparepart AS b ON b.kode = a.kode where kondisi="new"*/
-        $this->db->select('*');    
-        $this->db->from($this->table);
-        $this->db->join('sparepart', 'sparepart.kode='.$this->table.'.kode');
-        $this->db->order_by($this->table.'.tgl', 'DESC');
-        //$this->db->query("SELECT * FROM table");
+            $this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Masuk,a.KeyId');
+            $this->db->from($this->table.' AS a');
+            $this->db->join('masterbarang AS b', 'b.KodeBarang=a.KodeBarang','left');
+            $this->db->join('customer AS c', 'c.customer_id=a.CustomerId','left');
+            $this->db->where('a.JenisTransaksi','2');
+            $this->db->where('a.status','new');
         $i = 0;
      
         foreach ($this->column_search as $item) // loop column 
@@ -81,7 +81,7 @@ class Model_trxbengkel extends CI_Model {
     public function get_by_id($id)
     {
         $this->db->from($this->table);
-        $this->db->where('id',$id);
+        $this->db->where('KeyId',$id);
         $query = $this->db->get();
  
         return $query->row();
@@ -101,7 +101,7 @@ class Model_trxbengkel extends CI_Model {
  
     public function delete_by_id($id)
     {
-        $this->db->where('id', $id);
+        $this->db->where('KeyId', $id);
         $this->db->delete($this->table);
     }
  

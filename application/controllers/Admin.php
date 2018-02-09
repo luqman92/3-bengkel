@@ -816,11 +816,10 @@ class Admin extends CI_Controller {
 			'tgl_lunas' => $this->input->post('tgl_lunas'),
 			'km' => $this->input->post('km'),
 			'keluhan' => $this->input->post('keluhan'),
-			'keterangan' => $this->input->post('keterangan')
+			'keterangan' => $this->input->post('keterangan'),
+			'id_mekanik'=>$this->input->post('id_mekanik')
 			);
 		$where = array('id' => $id);
-		//$this->trx->update(array('id' => $this->input->post('id')), $data);
-		/*update_data($where,$data,$table)*/
 		$this->Model_admin->update_data($where,$data,'transaksi');
 		redirect('admin/trxbengkel/'.$id);
 	}
@@ -859,10 +858,21 @@ class Admin extends CI_Controller {
 													LEFT JOIN customer AS b ON a.customer_id = b.customer_id
 												WHERE id="'.$trx_id.'"')->result();
 			$mekanik = $this->Model_admin->manualQuery('SELECT * FROM karyawan WHERE id_jabatan="MK"')->result();
+			$dtmb = $this->Model_admin->manualQuery('SELECT
+												a.KodeBarang,
+												a.KodeCabang,
+												a.NamaBarang,
+												a.HPP,
+												a.HargaJual,
+												b.StokAkhir 
+											FROM
+												masterbarang AS a
+												INNER JOIN stokbarang AS b ON a.KodeBarang = b.KodeBarang')->result();
 			$data = array(
 				'KdTrx' => $trx_id,
 				'dtrxs' => $dtrx,
 				'mekaniks' => $mekanik,
+				'dtmbs' => $dtmb,
 				);
 			$this->template_admin->load('template_admin','Moduls/trxbengkel/index',$data);
 			
@@ -881,16 +891,14 @@ class Admin extends CI_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $trx->kode;
-            $row[] = $trx->jenis;
-            $row[] = $trx->keterangan;
-            $row[] = $trx->harga;
-            $row[] = $trx->qty;
-            $row[] = $trx->pot;
-            $row[] = $trx->total;
- 
+            $row[] = $trx->KodeBarang;
+            $row[] = $trx->NamaBarang;
+            $row[] = $trx->HargaJual;
+            $row[] = $trx->Masuk;
+            $row[] = $trx->HargaJual*$trx->Masuk;
+            
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxl('."'".$trx->key."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxbengkel('."'".$trx->KeyId."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  
             $data[] = $row;
         }
@@ -915,12 +923,16 @@ class Admin extends CI_Controller {
  
     public function ajax_add_trxbengkel()
     {
+    	$user = $this->session->userdata('iduser');
+    	$currdate = date('Y-m-d');
         $data = array(
-                'firstName' => $this->input->post('firstName'),
-                'lastName' => $this->input->post('lastName'),
-                'gender' => $this->input->post('gender'),
-                'address' => $this->input->post('address'),
-                'dob' => $this->input->post('dob'),
+        		'JenisTransaksi' => '2',
+                'NomorTransaksi' => $this->input->post('NomorTransaksi'),
+                'CustomerId' => $this->input->post('CustomerId'),
+                'KodeBarang' => $this->input->post('KodeBarang'),
+                'Masuk' => $this->input->post('Masuk'),
+                'TanggalTransaksi' => $currdate,
+                'UserId' => $user,
             );
         $insert = $this->trx->save($data);
         header('Content-Type: application/json');
@@ -930,13 +942,10 @@ class Admin extends CI_Controller {
     public function ajax_update_trxbengkel()
     {
         $data = array(
-                'firstName' => $this->input->post('firstName'),
-                'lastName' => $this->input->post('lastName'),
-                'gender' => $this->input->post('gender'),
-                'address' => $this->input->post('address'),
-                'dob' => $this->input->post('dob'),
+                'KodeBarang' => $this->input->post('KodeBarang'),
+                'Masuk' => $this->input->post('Masuk'),
             );
-        $this->trx->update(array('id' => $this->input->post('id')), $data);
+        $this->trx->update(array('KeyId' => $this->input->post('KeyId')), $data);
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }

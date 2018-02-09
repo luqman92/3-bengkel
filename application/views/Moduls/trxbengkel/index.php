@@ -33,7 +33,9 @@
                                             <div id="collapseOne" class="panel-collapse collapse">
                                                 <div class="box-body">
                                     <?php
+                                    $customer_id = "";
                                     foreach($dtrxs AS $dtrx){
+                                        $customer_id = $dtrx->customer_id;
                                     ?>
                                 <form action="<?php echo site_url('admin/trxbengkelup')?>" method="post">
                                     <a class="btn btn-success" href="<?=site_url('admin/unsetcust')?>"><i class="glyphicon glyphicon-plus"></i> Pilih Customer</a>
@@ -137,7 +139,7 @@
                                             </div>
                                             <div id="collapseTwo" class="panel-collapse collapse in">
                                                 <div class="box-body">
-                                                <button class="btn btn-success" onclick="add_person()"><i class="glyphicon glyphicon-plus"></i> JASA/SERVICE</button>
+                                                <button class="btn btn-success" onclick="add_trxbengkel()"><i class="glyphicon glyphicon-plus"></i> JASA/SERVICE</button>
                                                 <button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
                                                 <br />
                                                 <br />
@@ -145,12 +147,10 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>No</th>
-                                                                <th>Kode</th>
-                                                                <th>Jenis</th>
+                                                                <th>Kode Barang</th>
                                                                 <th>Keterangan</th>
                                                                 <th>@Harga (Rp)</th>
                                                                 <th>Qty</th>
-                                                                <th>Pot (%)</th>
                                                                 <th>Jumlah (Rp)</th>
                                                                 <th>Action</th>
 
@@ -162,18 +162,24 @@
                                                         <tfoot>
                                                             <tr>
                                                                 <th>No</th>
-                                                                <th>Kode</th>
-                                                                <th>Jenis</th>
+                                                                <th>Kode Barang</th>
                                                                 <th>Keterangan</th>
                                                                 <th>@Harga (Rp)</th>
                                                                 <th>Qty</th>
-                                                                <th>Pot (%)</th>
                                                                 <th>Jumlah (Rp)</th>
                                                                 <th>Action</th>
                                                                 
                                                             </tr>
                                                         </tfoot>
                                                     </table>
+
+                                                    <form action="<?=site_url('#')?>" method="post">
+                                                        <div class="form-group">
+                                                            <label></label>
+                                                            <input type="hidden" name="NomorTransaksi" value="<?=$KdTrx?>"><br><br>
+                                                            <button style="float:right" class="btn btn-success" type="submit">Simpan</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -260,17 +266,17 @@ jQuery(document).ready(function() {
  
  
  
-function add_person()
+function add_trxbengkel()
 {
     save_method = 'add';
     $('#form')[0].reset(); // reset form on modals
     $('.form-group').removeClass('has-error'); // clear error class
     $('.help-block').empty(); // clear error string
     $('#modal_form').modal('show'); // show bootstrap modal
-    $('.modal-title').text('Add Person'); // Set Title to Bootstrap modal title
+    $('.modal-title').text('Add Jasa/Service'); // Set Title to Bootstrap modal title
 }
  
-function edit_person(id)
+function edit_trxbengkel(id)
 {
     save_method = 'update';
     $('#form')[0].reset(); // reset form on modals
@@ -294,7 +300,7 @@ function edit_person(id)
             $('[name="pot]').val(data.pot);
             $('[name="total"]').val(data.total);
             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-            $('.modal-title').text('Edit Person'); // Set title to Bootstrap modal title
+            $('.modal-title').text('Edit Jasa/Service'); // Set title to Bootstrap modal title
  
         },
         error: function (jqXHR, textStatus, errorThrown)
@@ -308,6 +314,7 @@ function reload_table()
 {
     //alert('TEST') ;
     table.ajax.reload(null,false); //reload datatable ajax 
+    document.location.reload();
 }
  
 function save()
@@ -352,7 +359,7 @@ function save()
     });
 }
  
-function delete_person(id)
+function delete_trxbengkel(id)
 {
     if(confirm('Are you sure delete this data?'))
     {
@@ -384,48 +391,36 @@ function delete_person(id)
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title">Person Form</h3>
+                <h3 class="modal-title">Jasa/Service Form</h3>
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
-                    <input type="hidden" value="" name="id"/> 
+                    <input type="hidden" value="" name="KeyId"/>
+                    <input type="hidden" value="<?=$KdTrx?>" name="NomorTransaksi"/>
+                    <input type="hidden" value="<?=$customer_id?>" name="CustomerId"/>
                     <div class="form-body">
+                        
                         <div class="form-group">
-                            <label class="control-label col-md-3">First Name</label>
+                            <label class="control-label col-md-3">Nama Barang</label>
                             <div class="col-md-9">
-                                <input name="firstName" placeholder="First Name" class="form-control" type="text">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Last Name</label>
-                            <div class="col-md-9">
-                                <input name="lastName" placeholder="Last Name" class="form-control" type="text">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Gender</label>
-                            <div class="col-md-9">
-                                <select name="gender" class="form-control">
-                                    <option value="">--Select Gender--</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
+                                <select name="KodeBarang" class="form-control">
+                                    <option value="">--Select Barang--</option>
+                                    <?php
+                                    foreach($dtmbs AS $dtmb){
+                                        ?>
+                                        <option value="<?=$dtmb->KodeBarang?>"><?=$dtmb->NamaBarang?></option>
+                                        <?php
+                                    }
+                                    ?>
                                 </select>
                                 <span class="help-block"></span>
                             </div>
                         </div>
+                        
                         <div class="form-group">
-                            <label class="control-label col-md-3">Address</label>
+                            <label class="control-label col-md-3">Jumlah</label>
                             <div class="col-md-9">
-                                <textarea name="address" placeholder="Address" class="form-control"></textarea>
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Date of Birth</label>
-                            <div class="col-md-9">
-                                <input name="dob" placeholder="yyyy-mm-dd" class="form-control datepicker" type="text">
+                                <input name="Masuk" placeholder="" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>
