@@ -113,7 +113,8 @@ class Masterbarang_model extends CI_Model {
 
 	// KODE BARANG
     function getKodeBrg(){
-        $q = $this->db->query("select MAX(RIGHT(KodeBarang,6)) as kd_max from masterbarang");
+        $q = $this->db->query("select MAX(RIGHT(KodeBarang,6)) as kd_max from masterbarang WHERE KodeBarang != 'JST'
+	AND KodeBarang != 'JSV'");
         $kd = "";
         if($q->num_rows()>0){
             foreach($q->result() as $k){

@@ -16,7 +16,7 @@ class Model_trxbengkel extends CI_Model {
  
     private function _get_datatables_query()
     {
-            $this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Masuk,a.KeyId');
+            $this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Keluar,a.KeyId');
             $this->db->from($this->table.' AS a');
             $this->db->join('masterbarang AS b', 'b.KodeBarang=a.KodeBarang','left');
             $this->db->join('customer AS c', 'c.customer_id=a.CustomerId','left');

@@ -172,14 +172,33 @@
                                                             </tr>
                                                         </tfoot>
                                                     </table>
+<div class="row">
+<div class="col-md-9"></div>
+<div class="col-md-3">
 
-                                                    <form action="<?=site_url('#')?>" method="post">
+                                                    <form id='form1' action="<?=site_url('admin/act_trxbengkelup')?>" method="post">
+                                                        <div class="form-group">
+                                                            <label>Total</label>
+                                                            <input class="txt form-control" type="text" id="total" onchange="hitung()" value="10000">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label>Dibayar</label> 
+                                                            <input class="txt form-control" type="text" id="dibayar" onchange="hitung()" value="5000">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label>Kembalian</label>
+                                                            <input class="form-control" type="text" id="kembalian">
+                                                        </div>
                                                         <div class="form-group">
                                                             <label></label>
                                                             <input type="hidden" name="NomorTransaksi" value="<?=$KdTrx?>"><br><br>
                                                             <button style="float:right" class="btn btn-success" type="submit">Simpan</button>
                                                         </div>
                                                     </form>
+</div>
+</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -189,6 +208,15 @@
                         </div>
                     </div>
                 </section>
+
+<script type="text/javascript">
+    function hitung() {
+    var a = $("#total").val();
+    var b = $("#dibayar").val();
+    c = a - b; //a kali b
+    $("#kembalian").val();
+}        
+</script>
 
 <script type="text/javascript">
  
@@ -420,7 +448,7 @@ function delete_trxbengkel(id)
                         <div class="form-group">
                             <label class="control-label col-md-3">Jumlah</label>
                             <div class="col-md-9">
-                                <input name="Masuk" placeholder="" class="form-control" type="text">
+                                <input name="Keluar" placeholder="" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>

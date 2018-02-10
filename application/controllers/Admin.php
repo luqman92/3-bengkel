@@ -744,8 +744,11 @@ class Admin extends CI_Controller {
             $row[] = $trxl->mekanik;
             
             //add html for action
+            if($trxl->status=='final'){
+            $row[] = '<a class="btn btn-sm btn-primary" href="#" title="Lunas"><i class="glyphicon glyphicon-check"></i> LUNAS</a>';
+            }else{
             $row[] = '<a class="btn btn-sm btn-primary" href="'.site_url('admin/trx_bkl/'.$trxl->id).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a> <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxl('."'".$trxl->id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
- 
+ 			}
             $data[] = $row;
         }
  
@@ -823,7 +826,26 @@ class Admin extends CI_Controller {
 		$this->Model_admin->update_data($where,$data,'transaksi');
 		redirect('admin/trxbengkel/'.$id);
 	}
+	function act_trxbengkelup()
+	{
+		$NomorTransaksi = $this->input->post('NomorTransaksi');
+		$mutasibarang = $this->Model_admin->manualQuery('SELECT * FROM mutasibarang WHERE NomorTransaksi="'.$NomorTransaksi.'"')->result();
+		foreach ($mutasibarang as $data) {
+			$NomorTransaksi = $data->NomorTransaksi;
+			$KeyId = $data->KeyId;
+			$KodeBarang = $data->KodeBarang;
+			$Keluar = $data->Keluar;
+			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir-"'.$Keluar.'" WHERE KodeBarang="'.$KodeBarang.'"');
 
+			/*$data = array(
+				'KeyId'=>$KeyId,
+				);*/
+			$update = $this->Model_admin->manualQuery('UPDATE mutasibarang SET status="normal" WHERE NomorTransaksi="'.$NomorTransaksi.'"');
+			$update2 = $this->Model_admin->manualQuery('UPDATE transaksi SET status="final" WHERE id="'.$NomorTransaksi.'"');
+		}
+		
+	redirect('admin/trxlist');
+	}
 	public function trxbengkel($id="")
 	{
 		$trx_id = $this->session->userdata('trx_id');
@@ -867,7 +889,7 @@ class Admin extends CI_Controller {
 												b.StokAkhir 
 											FROM
 												masterbarang AS a
-												INNER JOIN stokbarang AS b ON a.KodeBarang = b.KodeBarang')->result();
+												LEFT JOIN stokbarang AS b ON a.KodeBarang = b.KodeBarang')->result();
 			$data = array(
 				'KdTrx' => $trx_id,
 				'dtrxs' => $dtrx,
@@ -894,8 +916,8 @@ class Admin extends CI_Controller {
             $row[] = $trx->KodeBarang;
             $row[] = $trx->NamaBarang;
             $row[] = $trx->HargaJual;
-            $row[] = $trx->Masuk;
-            $row[] = $trx->HargaJual*$trx->Masuk;
+            $row[] = $trx->Keluar;
+            $row[] = $trx->HargaJual*$trx->Keluar;
             
             //add html for action
             $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxbengkel('."'".$trx->KeyId."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
@@ -930,7 +952,7 @@ class Admin extends CI_Controller {
                 'NomorTransaksi' => $this->input->post('NomorTransaksi'),
                 'CustomerId' => $this->input->post('CustomerId'),
                 'KodeBarang' => $this->input->post('KodeBarang'),
-                'Masuk' => $this->input->post('Masuk'),
+                'Keluar' => $this->input->post('Keluar'),
                 'TanggalTransaksi' => $currdate,
                 'UserId' => $user,
             );
@@ -943,7 +965,7 @@ class Admin extends CI_Controller {
     {
         $data = array(
                 'KodeBarang' => $this->input->post('KodeBarang'),
-                'Masuk' => $this->input->post('Masuk'),
+                'Keluar' => $this->input->post('Keluar'),
             );
         $this->trx->update(array('KeyId' => $this->input->post('KeyId')), $data);
         header('Content-Type: application/json');

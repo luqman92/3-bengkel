@@ -27,12 +27,12 @@ class Transaksi_model extends CI_Model {
 		}*/
 		$date = new DateTime("now");
 		$curr_date = $date->format('Y-m-d');
-			$this->db->select('a.tgl,b.nama AS cust,b.no_polisi,a.id,c.nama AS mekanik');
+			$this->db->select('a.tgl,b.nama AS cust,b.no_polisi,a.id,c.nama AS mekanik,a.status');
 			$this->db->from($this->table.' AS a');
 			$this->db->join('customer AS b', 'b.customer_id=a.customer_id','left');
 			$this->db->join('karyawan AS c', 'c.karyawan_id=a.id_mekanik','left');
 			$this->db->where('tgl', $curr_date);
-			$this->db->where('a.status', 'normal');
+			$this->db->where('a.status !=', 'nullified');
         $i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 
