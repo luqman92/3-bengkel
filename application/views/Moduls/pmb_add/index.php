@@ -394,7 +394,7 @@ function delete_barang(id)
                         <div class="form-group">
                             <label class="control-label col-md-3">Barang</label>
                             <div class="col-md-9">
-                                <select name="KodeBarang" class="form-control" id="">
+                                <select name="KodeBarang" class="form-control" id="searchbrg">
                                     <option value="">--Select Barang--</option>
                                     <?php
                                     foreach ($mstrbrgs as $mstrbrg) {
