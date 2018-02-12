@@ -1297,20 +1297,20 @@ VALUES ($max+1 , 'jim', 'sock')*/
 		/*echo "<pre>";
 			print_r($_POST);
 		echo "</pre>";*/
-		$NomorTransaksi = $this->input->post('NomorTransaksi');
-		$mutasibarang = $this->Model_admin->manualQuery('SELECT * FROM mutasibarang WHERE NomorTransaksi="'.$NomorTransaksi.'"')->result();
+		$no_pmb = $this->input->post('NomorTransaksi');
+		$mutasibarang = $this->Model_admin->manualQuery('SELECT * FROM sparepart_pmb WHERE no_pmb="'.$no_pmb.'"')->result();
 		foreach ($mutasibarang as $data) {
-			$NomorTransaksi = $data->NomorTransaksi;
-			$KeyId = $data->KeyId;
-			$KodeBarang = $data->KodeBarang;
-			$Masuk = $data->Masuk;
-			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir+"'.$Masuk.'" WHERE KodeBarang="'.$KodeBarang.'"');
+			$no_pmb = $data->no_pmb;
+			$key_id = $data->key_id;
+			$KodeBarang = $data->kode;
+			$qty = $data->qty;
+			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir+"'.$qty.'" WHERE KodeBarang="'.$KodeBarang.'"');
 
 			$data = array(
-				'KeyId'=>$KeyId,
+				'key_id'=>$key_id,
 				);
-			$update = $this->Model_admin->manualQuery('UPDATE mutasibarang SET status="normal" WHERE NomorTransaksi="'.$NomorTransaksi.'"');
-			$update2 = $this->Model_admin->manualQuery('UPDATE pmb_sparepart SET status="final" WHERE no_pmb="'.$NomorTransaksi.'"');
+			//$update = $this->Model_admin->manualQuery('UPDATE mutasibarang SET status="normal" WHERE NomorTransaksi="'.$NomorTransaksi.'"');
+			$update = $this->Model_admin->manualQuery('UPDATE pmb_sparepart SET status="final" WHERE no_pmb="'.$no_pmb.'"');
 		}
 		
 	redirect('admin/pembeliansparepart');
