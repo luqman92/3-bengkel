@@ -3,10 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Mutasibarang_model extends CI_Model {
 
-	var $table = 'mutasibarang';
+	var $table = 'sparepart_pmb';
 	var $column_order = array('KodeBarang','NamaBarang','Satuan','HPP','HargaJual',null); //set column field database for datatable orderable
 	var $column_search = array('KodeBarang','NamaBarang','Satuan'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('a.KodeBarang' => 'asc'); // default order 
+	var $order = array('a.key_id' => 'asc'); // default order 
 
 	public function __construct()
 	{
@@ -14,7 +14,7 @@ class Mutasibarang_model extends CI_Model {
 		$this->load->database();
 	}
 
-	private function _get_datatables_query()
+	private function _get_datatables_query($id="")
 	{
 		
 		/*if($id=='CBG-000001'){
@@ -31,12 +31,17 @@ mutasibarang AS a
 INNER JOIN masterbarang AS b ON a.KodeBarang = b.KodeBarang
 INNER JOIN customer AS c ON a.CustomerId = c.customer_id
 */
-			$this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Masuk,a.KeyId');
+			/*$this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Masuk,a.KeyId');
 			$this->db->from($this->table.' AS a');
 			$this->db->join('masterbarang AS b', 'b.KodeBarang=a.KodeBarang','left');
 			$this->db->join('customer AS c', 'c.customer_id=a.CustomerId','left');
 			$this->db->where('a.JenisTransaksi','1');
-			$this->db->where('a.status','new');
+			$this->db->where('a.status','new');*/
+			$this->db->select('*');
+			$this->db->from($this->table.' AS a');
+			//$this->db->join('sparepart_pmb AS b','b.no_pmb=a.no_pmb');
+			$this->db->where('a.no_pmb',$id);
+
         $i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 
@@ -71,18 +76,18 @@ INNER JOIN customer AS c ON a.CustomerId = c.customer_id
 		}
 	}
 
-	function get_datatables()
+	function get_datatables($id="")
 	{
-		$this->_get_datatables_query();
+		$this->_get_datatables_query($id);
 		if($_POST['length'] != -1)
 		$this->db->limit($_POST['length'], $_POST['start']);
 		$query = $this->db->get();
 		return $query->result();
 	}
 
-	function count_filtered()
+	function count_filtered($id="")
 	{
-		$this->_get_datatables_query();
+		$this->_get_datatables_query($id);
 		$query = $this->db->get();
 		return $query->num_rows();
 	}

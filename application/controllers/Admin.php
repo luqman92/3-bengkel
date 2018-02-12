@@ -990,12 +990,13 @@ class Admin extends CI_Controller {
 	public function pembeliansparepart()
 	{
 		$spp = $this->Model_admin->manualQuery('SELECT * FROM supplier')->result();
-		$no_pmb = "TRX".date('ymd').rand(100000,999999);
+		/*PB979501611-180216*/
+		//$no_pmb = "PB".date('ymd')."-".rand(100000,999999);
     	$cbg = $this->session->userdata('cabang');
-
+    	$NoPMB = $this->pmb->getKodePMB();
 		$data = array(
 			'spps'=>$spp,
-			'no_pmb'=>$no_pmb,
+			'NoPMB'=>$NoPMB,
 			'cbg'=>$cbg,
 			);
 		$this->template_admin->load('template_admin','Moduls/pembeliansparepart/index',$data);
@@ -1014,7 +1015,7 @@ class Admin extends CI_Controller {
             $row[] = $no;
             $row[] = $pmb->tgl;
             $row[] = $pmb->no_pmb;
-            $row[] = $pmb->nama;
+            $row[] = $pmb->supplier;
             
             //add html for action
                 if($pmb->status == 'final'){
@@ -1051,9 +1052,11 @@ class Admin extends CI_Controller {
         
         $data = array(
                 'no_pmb' => $this->input->post('no_pmb'),
-                'SupplierId' => $this->input->post('SupplierId'),
+                'supplier' => $this->input->post('nama'),
                 'cabang_id' => $cbg,
                 'tgl' => $currdate,
+                'tgl_tempo' => $currdate,
+                'tgl_lunas' => $currdate,
                 );
         $this->Model_admin->create_data($data,'pmb_sparepart');
         header('Content-Type: application/json');
@@ -1082,6 +1085,10 @@ class Admin extends CI_Controller {
 	public function pmb_add($id)
 	{
 		$NoTrx = $id;
+		$sess_data['NoPMB'] = $NoTrx;
+		$this->session->set_userdata($sess_data);
+
+		$cara = $this->Model_admin->manualQuery('SELECT * FROM carabayar')->result();
 		$pmb_sp = $this->Model_admin->manualQuery('SELECT
 										a.no_pmb,
 										a.no_sj,
@@ -1096,11 +1103,9 @@ class Admin extends CI_Controller {
 										a.post,
 										a.ket_cara,
 										a.tgl_lunas,
-										a.cabang_id,
-										b.nama 
+										a.cabang_id
 									FROM
 										pmb_sparepart AS a
-										INNER JOIN supplier AS b ON a.SupplierId = b.supplier_id
 										WHERE a.no_pmb="'.$NoTrx.'"')->result();
 		$mstrbrg = $this->Model_admin->manualQuery('SELECT
 										a.KodeBarang,
@@ -1118,6 +1123,7 @@ class Admin extends CI_Controller {
 			'NoTrxs' => $NoTrx,
 			'pmb_sps' => $pmb_sp,
 			'mstrbrgs' => $mstrbrg,
+			'caras' => $cara,
 			);
 		$this->template_admin->load('template_admin','Moduls/pmb_add/index',$data);
 	}
@@ -1125,24 +1131,22 @@ class Admin extends CI_Controller {
 	/*AJAX PEMASUKAN BENGKEL*/
 	public function ajax_list_pmba()
     {
-    	$cbg = $this->session->userdata('cabang');
-		$list = $this->mtb->get_datatables($cbg);
+    	$NoPMB = $this->session->userdata('NoPMB');
+		$list = $this->mtb->get_datatables($NoPMB);
         $data = array();
         $no = $_POST['start'];
         foreach ($list as $mtb) {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $mtb->KodeBarang;
+            $row[] = $mtb->diskripsi;
+            $row[] = $mtb->harga;
+            $row[] = $mtb->qty;
             //$row[] = '';
-            $row[] = $mtb->NamaBarang;
-            $row[] = $mtb->HargaJual;
-            $row[] = $mtb->Masuk;
-            //$row[] = '';
-            $row[] = $mtb->HargaJual*$mtb->Masuk;
+            $row[] = $mtb->total;
             
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_barang('."'".$mtb->KeyId."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_barang('."'".$mtb->key_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
                  /* $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
                   <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
  
@@ -1151,8 +1155,8 @@ class Admin extends CI_Controller {
  
         $output = array(
                         "draw" => $_POST['draw'],
-                        "recordsTotal" => $this->mtb->count_all($cbg),
-                        "recordsFiltered" => $this->mtb->count_filtered($cbg),
+                        "recordsTotal" => $this->mtb->count_all(),
+                        "recordsFiltered" => $this->mtb->count_filtered(),
                         "data" => $data,
                 );
         //output to json format
@@ -1172,18 +1176,50 @@ class Admin extends CI_Controller {
     	$iduser = $this->session->userdata('iduser');
     	$cbg = $this->session->userdata('cabang');
     	$currdate = date('Y-m-d');
+
+    	$KodeBarang = $this->input->post('KodeBarang');
+    	$NomorTransaksi = $this->input->post('NomorTransaksi');
+    	$supplier = $this->input->post('supplier');
+    	$Masuk = $this->input->post('Masuk');
+    	$harga = $this->input->post('harga');
+    	$Total = $this->input->post('harga')*$this->input->post('Masuk');
+
         
         $data = array(
                 'KodeBarang' => $this->input->post('KodeBarang'),
                 'NomorTransaksi' => $this->input->post('NomorTransaksi'),
-                'SupplierId' => $this->input->post('SupplierId'),
+                'SupplierId' => $this->input->post('supplier'),
                 'Masuk' => $this->input->post('Masuk'),
                 'UserId' => $iduser,
                 'TanggalTransaksi' => $currdate,
                 'Status' => 'new',
                 'JenisTransaksi' => '1',
                 );
+        /*$max = SELECT MAX( customer_id ) FROM customers;*/
+        /*INSERT INTO customers( customer_id, firstname, surname )
+VALUES ($max+1 , 'jim', 'sock')*/
+//$max = $this->Model_admin->manualQuery('SELECT MAX(item) FROM sparepart_pmb WHERE no_pmb="'.$NomorTransaksi.'"');
+		$dtmb = $this->Model_admin->manualQuery('SELECT * FROM masterbarang WHERE KodeBarang="'.$KodeBarang.'"')->result();
+		foreach ($dtmb as $dt) {
+		$NamaBarang=$dt->NamaBarang;	
+		$dataspmb = array(
+                'kode' => $this->input->post('KodeBarang'),
+                'no_pmb' => $this->input->post('NomorTransaksi'),
+                'qty' => $this->input->post('Masuk'),
+                'harga' => $this->input->post('harga'),
+                'diskripsi' => $NamaBarang,
+                'total' => $this->input->post('harga')*$this->input->post('Masuk'),
+                'UserId' => $iduser,
+                'kondisi' => 'new'
+                );
+		$this->Model_admin->create_data($dataspmb,'sparepart_pmb');
+        }
+        
         $this->Model_admin->create_data($data,'mutasibarang');
+        /*StokAkhir=StokAkhir+"'.$Masuk.'"*/
+       // $max = $this->Model_admin->manualQuery('SELECT MAX(item) FROM sparepart_pmb WHERE no_pmb="'.$NomorTransaksi.'"');
+       // $this->Model_admin->manualQuery('INSERT INTO sparepart_pmb SET no_pmb=$NomorTransaksi,kode=$KodeBarang,qty=$Masuk,harga=$harga,total=$total,UserId=$iduser,kondisi="new",item=$max+1');
+        //$this->Model_admin->manualQuery("INSERT INTO sparepart_pmb SET no_pmb='".$NomorTransaksi."',item='".$max+'1'."'");
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
@@ -1217,6 +1253,7 @@ class Admin extends CI_Controller {
 		$data = array(
 			'cara'=>$this->input->post('cara'),
 			'tgl'=>$this->input->post('tgl'),
+			'no_sj'=>$this->input->post('no_sj'),
 			'tgl_tempo'=>$this->input->post('tgl_tempo'),
 			'tgl_lunas'=>$this->input->post('tgl_lunas'),
 			'keterangan'=>$this->input->post('keterangan'),

@@ -27,4 +27,11 @@ class Model_admin extends CI_Model{
     {
         return $this->db->query($q);
     }
+
+    function create_datas()
+    {
+    	$this->db->set('field', 'field+1', FALSE);
+		$this->db->insert('mytable');
+		// gives INSERT INTO mytable (field) VALUES (field+1)
+    }
 }

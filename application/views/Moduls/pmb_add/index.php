@@ -2,7 +2,7 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Form Transaksi
+                        Form Pembelian Sparepart Motor
                         <small></small>
                     </h1>
                     <ol class="breadcrumb">
@@ -26,74 +26,86 @@
                                             <div class="box-header">
                                                 <h4 class="box-title">
                                                     <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                                        Informasi Order
+                                                        Data Invoice
                                                     </a>
                                                 </h4>
                                             </div>
                                             <div id="collapseOne" class="panel-collapse collapse">
                                                 <div class="box-body">
-                                    <?php
-                                    $SupplierId = "";
-                                    foreach($pmb_sps AS $pmb_sp){
-                                        $SupplierId = $pmb_sp->SupplierId;
-                                    ?>
-                                <form action="<?php echo site_url('admin/pmb_addup')?>" method="post">
-                                    <!-- <a class="btn btn-success" href="<?=site_url('admin/unsetcust')?>"><i class="glyphicon glyphicon-plus"></i> Pilih Customer</a> -->
-                                         <br>
-                                         <br>
-                                         <br>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-xs-2">
-                                                <label>No Trans #</label>
-                                                <input class="form-control" type="text" name="id" value="<?=$NoTrxs?>" readonly>
-                                            </div>
-                                            <div class="col-xs-2">
-                                                <label>Cara Bayar</label>
-                                                <select class="form-control" name="cara">
-                                                    <option value="TUNAI">TUNAI</option>
-                                                    <option value="HUTANG">HUTANG</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-xs-2">
-                                                <label>Tgl Transaksi</label>
-                                                <input class="form-control" type="text" name="tgl" value="<?=$pmb_sp->tgl?>">
-                                            </div>
-                                            <div class="col-xs-2">
-                                                <label>Jatuh Tempo</label>
-                                                <input class="form-control" type="text" name="tgl_tempo" value="<?=$pmb_sp->tgl_tempo?>">
-                                            </div>
-                                            <div class="col-xs-2">
-                                                <label>Tgl Lunas</label>
-                                                <input class="form-control" type="text" name="tgl_lunas" value="<?=$pmb_sp->tgl_lunas?>">
-                                            </div>
-                                        </div>
-                                    </div>
+                                                
+                                                <?php
+                                                    $supplier = "";
+                                                    foreach($pmb_sps AS $pmb_sp){
+                                                        $supplier = $pmb_sp->supplier;
+                                                ?>
+                                                <form action="<?php echo site_url('admin/pmb_addup')?>" method="post">
+                                                    <div class="row">
+                                                        <div class="col-md-5">
+                                                           <div class="form-group">
+                                                                <label>NO PMB</label>
+                                                                <input class="form-control" type="text" name="id" value="<?=$NoTrxs?>" readonly>
+                                                           </div>
+                                                           <div class="form-group">
+                                                                <label>NO SJ</label>
+                                                                <input class="form-control" type="text" name="no_sj" value="<?=$pmb_sp->no_sj?>">
+                                                           </div>
+                                                           <div class="form-group">
+                                                                <label>Supplier</label>
+                                                                <input class="form-control" type="text" value="<?=$pmb_sp->supplier?>" readonly>
+                                                           </div>
+                                                           <div class="form-group">
+                                                                <label>Cara Bayar</label>
+                                                                <select class="form-control" name="cara">
+                                                                    <option>-- Pilih Cara Bayar --</option>
+                                                                    <?php
+                                                                        foreach ($caras as $carabyr) {
+                                                                        $selected="";
+                                                                        if($pmb_sp->cara == $carabyr->cara){
+                                                                            $selected = "selected";
+                                                                        }
+                                                                            ?>
+                                                                                <option value="<?=$carabyr->cara?>" <?=$selected?>><?=$carabyr->cara?></option>
+                                                                            <?php
+                                                                        }
+                                                                    ?>
+                                                                    <!-- <option value="LUNAS">LUNAS</option>
+                                                                    <option value="HUTANG">HUTANG</option> -->
+                                                                </select>
+                                                           </div>
+                                                           <div class="form-group">
+                                                                <label>Keterangan</label>
+                                                                <input class="form-control" type="text" name="keterangan" value="<?=$pmb_sp->keterangan?>">
+                                                           </div>
+                                                        <div class="form-group">
+                                                            <input class="btn btn-success" type="submit" name="" value="Submit" />
+                                                        </div>    
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <div class="form-group">
+                                                                <label>Tanggal beli</label>
+                                                                <input class="form-control" type="date" name="tgl" value="<?=$pmb_sp->tgl?>">
+                                                           </div>
+                                                           <div class="form-group">
+                                                                <label>Jatuh tempo</label>
+                                                                <input class="form-control" type="date" name="tgl_tempo" value="<?=$pmb_sp->tgl_tempo?>">
+                                                           </div>
+                                                           <div class="form-group">
+                                                                <label>Tanggal Lunas</label>
+                                                                <input class="form-control" type="date" name="tgl_lunas" value="<?=$pmb_sp->tgl_lunas?>">
+                                                           </div>
 
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-xs-2">
-                                                <label>Supplier</label>
-                                                <input class="form-control" type="text" name="nama" value="<?=$pmb_sp->nama?>" readonly>
-                                            </div>
-                                            <div class="col-xs-8">
-                                                <label>Keterangan</label>
-                                                <textarea class="form-control" name="keterangan"><?=$pmb_sp->keterangan?></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-xs-2">
-                                                <input class="btn btn-success" type="submit" name="" value="Submit" />
-                                            </div>
-                                        </div>
-                                    </div>                                    
-                                    </form>
-                                    <?php } ?>
-                                    
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <br>
+                                                            <br>
+                                                            <center><h1 style="font-weight:bold;"><?=$pmb_sp->cara?></h1></center>
+                                                        </div>
+                                                          
+                                                    </div>
                                                 </div>
+                                                </form>
+                                                <?php } ?>
+                                                
                                             </div>
                                         </div>
                                         <div class="panel box box-danger">
@@ -114,8 +126,6 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>No</th>
-                                                                <th>Kode</th>
-                                                                <!-- <th>Jenis</th> -->
                                                                 <th>Keterangan</th>
                                                                 <th>@Harga (Rp)</th>
                                                                 <th>Qty</th>
@@ -131,8 +141,6 @@
                                                         <tfoot>
                                                             <tr>
                                                                 <th>No</th>
-                                                                <th>Kode</th>
-                                                                <!-- <th>Jenis</th> -->
                                                                 <th>Keterangan</th>
                                                                 <th>@Harga (Rp)</th>
                                                                 <th>Qty</th>
@@ -380,13 +388,13 @@ function delete_barang(id)
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="id"/> 
-                    <input type="hidden" name="SupplierId" placeholder="" class="form-control" type="text" value="<?=$SupplierId?>">
+                    <input type="hidden" name="supplier" placeholder="" class="form-control" type="text" value="<?=$supplier?>">
                     <input type="hidden" name="NomorTransaksi" placeholder="" class="form-control" type="text" value="<?=$NoTrxs?>">
                     <div type="hidden" class="form-body">
                         <div class="form-group">
                             <label class="control-label col-md-3">Barang</label>
                             <div class="col-md-9">
-                                <select name="KodeBarang" class="form-control" id="searchbrg">
+                                <select name="KodeBarang" class="form-control" id="">
                                     <option value="">--Select Barang--</option>
                                     <?php
                                     foreach ($mstrbrgs as $mstrbrg) {
@@ -404,6 +412,14 @@ function delete_barang(id)
                             <label class="control-label col-md-3">Jumlah</label>
                             <div class="col-md-9">
                                 <input name="Masuk" placeholder="" class="form-control" type="text">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Harga</label>
+                            <div class="col-md-9">
+                                <input name="harga" placeholder="" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>

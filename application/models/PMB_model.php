@@ -45,13 +45,13 @@ FROM
 	pmb_sparepart AS a
 	INNER JOIN supplier AS b ON a.SupplierId = b.supplier_id*/
 		if($id==''){
-			$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama,a.status');
+			$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,a.status');
 			$this->db->from($this->table.' AS a');
-			$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
+			//$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
         }else{
-        	$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,b.nama,a.status');
+        	$this->db->select('a.no_pmb,a.no_sj,a.SupplierId,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,a.cabang_id,a.status');
 			$this->db->from($this->table.' AS a');
-			$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
+			//$this->db->join('supplier AS b', 'b.supplier_id=a.SupplierId');
 			$this->db->where('a.cabang_id', $id);
         }
 		//$this->db->simple_query('SELECT * FROM '.$this->table);
@@ -161,18 +161,20 @@ FROM
 	}
 
 	// KODE BARANG
-    function getKodeCabang(){
-        $q = $this->db->query("select MAX(RIGHT(cabang_id,6)) as kd_max from cabang");
+	/*PB979501611-180216*/
+    function getKodePMB(){
+    	$currdate = date('ymd');
+        $q = $this->db->query("select MAX(RIGHT(no_pmb,6)) as kd_max from pmb_sparepart");
         $kd = "";
         if($q->num_rows()>0){
             foreach($q->result() as $k){
                 $tmp = ((int)$k->kd_max)+1;
-                $kd = sprintf("%06s", $tmp);
+                $kd = sprintf("%09s", $tmp);
             }
         }else{
-            $kd = "000001";
+            $kd = "000000001";
         }
-        return "CBG-".$kd;
+        return "PB".$currdate."-".$kd;
     }
 
 
