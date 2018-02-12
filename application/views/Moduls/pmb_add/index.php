@@ -384,6 +384,7 @@ function delete_barang(id)
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="key_id"/> 
+                    <input type="hidden" value="<?=$NoTrxs?>" name="NomorTransaksi"/> 
                     <div type="hidden" class="form-body">
                         <div class="form-group">
                             <label class="control-label col-md-3">Barang</label>
