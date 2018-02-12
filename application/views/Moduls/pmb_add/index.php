@@ -282,14 +282,10 @@ function edit_barang(id)
         success: function(data)
         {
  
-            $('[name="id"]').val(data.id);
-            $('[name="kode"]').val(data.kode);
-            $('[name="jenis"]').val(data.jenis);
-            $('[name="keterangan"]').val(data.keterangan);
+            $('[name="key_id"]').val(data.key_id);
+            $('[name="KodeBarang"]').val(data.kode);
             $('[name="harga"]').val(data.harga);
-            $('[name="qty"]').val(data.qty);
-            $('[name="pot]').val(data.pot);
-            $('[name="total"]').val(data.total);
+            $('[name="Masuk"]').val(data.qty);
             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
             $('.modal-title').text('Edit Barang'); // Set title to Bootstrap modal title
  
@@ -387,9 +383,7 @@ function delete_barang(id)
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
-                    <input type="hidden" value="" name="id"/> 
-                    <input type="hidden" name="supplier" placeholder="" class="form-control" type="text" value="<?=$supplier?>">
-                    <input type="hidden" name="NomorTransaksi" placeholder="" class="form-control" type="text" value="<?=$NoTrxs?>">
+                    <input type="hidden" value="" name="key_id"/> 
                     <div type="hidden" class="form-body">
                         <div class="form-group">
                             <label class="control-label col-md-3">Barang</label>

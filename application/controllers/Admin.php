@@ -1146,7 +1146,7 @@ class Admin extends CI_Controller {
             $row[] = $mtb->total;
             
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_barang('."'".$mtb->key_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_barang('."'".$mtb->key_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a> <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_barang('."'".$mtb->key_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
                  /* $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
                   <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$pmb->no_pmb."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';*/
  
@@ -1227,10 +1227,12 @@ VALUES ($max+1 , 'jim', 'sock')*/
     public function ajax_update_pmba()
     {
     	$data = array(
-                'no_pmb' => $this->input->post('no_pmb'),
-                'SupplierId' => $this->input->post('SupplierId'),
+                'kode' => $this->input->post('KodeBarang'),
+                'qty' => $this->input->post('Masuk'),
+                'harga' => $this->input->post('harga'),
+                'total' => $this->input->post('harga')*$this->input->post('Masuk'),
                 );
-        $this->Model_admin->create_data($data,'pmb_sparepart');
+		$this->mtb->update(array('key_id' => $this->input->post('key_id')), $data);
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }

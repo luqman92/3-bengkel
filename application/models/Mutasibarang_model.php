@@ -4,8 +4,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Mutasibarang_model extends CI_Model {
 
 	var $table = 'sparepart_pmb';
-	var $column_order = array('KodeBarang','NamaBarang','Satuan','HPP','HargaJual',null); //set column field database for datatable orderable
-	var $column_search = array('KodeBarang','NamaBarang','Satuan'); //set column field database for datatable searchable just firstname , lastname , address are searchable
+	var $column_order = array('kode','diskripsi','harga','qty','',null); //set column field database for datatable orderable
+	var $column_search = array('kode','diskripsi','harga'); //set column field database for datatable searchable just firstname , lastname , address are searchable
 	var $order = array('a.key_id' => 'asc'); // default order 
 
 	public function __construct()
@@ -16,27 +16,6 @@ class Mutasibarang_model extends CI_Model {
 
 	private function _get_datatables_query($id="")
 	{
-		
-		/*if($id=='CBG-000001'){
-			$this->db->select('*');
-			$this->db->from($this->table);
-		}else{
-			$this->db->select('*');
-			$this->db->from($this->table);
-			$this->db->where('cabang_id', $id);
-		}*/
-		/*SELECT b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Masuk
-FROM
-mutasibarang AS a
-INNER JOIN masterbarang AS b ON a.KodeBarang = b.KodeBarang
-INNER JOIN customer AS c ON a.CustomerId = c.customer_id
-*/
-			/*$this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Masuk,a.KeyId');
-			$this->db->from($this->table.' AS a');
-			$this->db->join('masterbarang AS b', 'b.KodeBarang=a.KodeBarang','left');
-			$this->db->join('customer AS c', 'c.customer_id=a.CustomerId','left');
-			$this->db->where('a.JenisTransaksi','1');
-			$this->db->where('a.status','new');*/
 			$this->db->select('*');
 			$this->db->from($this->table.' AS a');
 			//$this->db->join('sparepart_pmb AS b','b.no_pmb=a.no_pmb');
@@ -101,7 +80,7 @@ INNER JOIN customer AS c ON a.CustomerId = c.customer_id
 	public function get_by_id($id)
 	{
 		$this->db->from($this->table);
-		$this->db->where('KeyId',$id);
+		$this->db->where('key_id',$id);
 		$query = $this->db->get();
 
 		return $query->row();
@@ -121,7 +100,7 @@ INNER JOIN customer AS c ON a.CustomerId = c.customer_id
 
 	public function delete_by_id($id)
 	{
-		$this->db->where('KeyId', $id);
+		$this->db->where('key_id', $id);
 		$this->db->delete($this->table);
 	}
 
