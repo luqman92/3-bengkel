@@ -36,13 +36,18 @@ class Admin extends CI_Controller {
 		$program = $this->Model_admin->manualQuery("SELECT count(id_album) AS jml FROM album_vod")->result();
 		$label = $this->Model_admin->manualQuery("SELECT count(id_label) AS jml FROM label")->result();
 		$kolumnis = $this->Model_admin->manualQuery("SELECT count(iduser) AS jml FROM user WHERE level='2'")->result();
+		*/
+		$trxbengkel = $this->Model_admin->manualQuery("SELECT count(id) AS jml FROM transaksi WHERE tgl=now()")->result();
+		$customer = $this->Model_admin->manualQuery("SELECT count(customer_id) AS jml FROM customer")->result();
+		$karyawan = $this->Model_admin->manualQuery("SELECT count(karyawan_id) AS jml FROM karyawan")->result();
+		$user = $this->Model_admin->manualQuery("SELECT count(iduser) AS jml FROM user")->result();
 		$data = array(
-			'articles' => $article,
-			'programs' => $program,
-			'labels' => $label,
-			'kolumniss' => $kolumnis,
-			);*/
-		 $this->template_admin->load('template_admin','Moduls/home');
+			'trxbengkels' => $trxbengkel,
+			'customers' => $customer,
+			'karyawans' => $karyawan,
+			'users' => $user,
+			);
+		 $this->template_admin->load('template_admin','Moduls/home',$data);
 	}
 /*
 -------------------------------------------------------------MASTER DATA----------------------------------------------------

@@ -19,11 +19,11 @@
                             <!-- small box -->
                             <div class="small-box bg-aqua">
                                 <div class="inner">
-                                    <h3>0
+                                    <h3>
                                         <?php
-                                        /*foreach($articles AS $article):
-                                            echo $article->jml;
-                                        endforeach;*/
+                                        foreach($trxbengkels AS $trxbengkel):
+                                            echo $trxbengkel->jml;
+                                        endforeach;
                                         ?>
                                     </h3>
                                     <p>
@@ -33,7 +33,7 @@
                                 <div class="icon">
                                     <i class="fa fa-book"></i>
                                 </div>
-                                <a href="<?php echo base_url() ?>admin/article" class="small-box-footer">
+                                <a href="#" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>
@@ -42,11 +42,11 @@
                             <!-- small box -->
                             <div class="small-box bg-green">
                                 <div class="inner">
-                                    <h3>0
+                                    <h3>
                                         <?php
-                                       /* foreach($programs AS $program):
-                                            echo $program->jml;
-                                        endforeach;*/
+                                       foreach($customers AS $customer):
+                                            echo $customer->jml;
+                                        endforeach;
                                         ?>
                                     </h3>
                                     <p>
@@ -56,7 +56,7 @@
                                 <div class="icon">
                                     <i class="fa fa-book"></i>
                                 </div>
-                                <a href="<?php echo base_url()?>admin/albumvod" class="small-box-footer">
+                                <a href="#" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>
@@ -65,11 +65,11 @@
                             <!-- small box -->
                             <div class="small-box bg-red">
                                 <div class="inner">
-                                    <h3>0
+                                    <h3>
                                         <?php
-                                        /*foreach($labels AS $label):
-                                            echo $label->jml;
-                                        endforeach;*/
+                                        foreach($karyawans AS $karyawan):
+                                            echo $karyawan->jml;
+                                        endforeach;
                                         ?>
                                     </h3>
                                     <p>
@@ -79,7 +79,7 @@
                                 <div class="icon">
                                     <i class="fa fa-tasks fa-fw"></i>
                                 </div>
-                                <a href="<?php echo base_url()?>admin/label" class="small-box-footer">
+                                <a href="#" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>
@@ -88,11 +88,11 @@
                             <!-- small box -->
                             <div class="small-box bg-yellow">
                                 <div class="inner">
-                                    <h3>0
+                                    <h3>
                                         <?php
-                                        /*foreach($kolumniss AS $kolumnis):
-                                            echo $kolumnis->jml;
-                                        endforeach;*/
+                                        foreach($users AS $user):
+                                            echo $user->jml;
+                                        endforeach;
                                         ?>
                                     </h3>
                                     <p>
@@ -102,7 +102,7 @@
                                 <div class="icon">
                                     <i class="ion ion-person-add"></i>
                                 </div>
-                                <a href="<?php echo base_url()?>admin/user" class="small-box-footer">
+                                <a href="#" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>
