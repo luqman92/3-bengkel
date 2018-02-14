@@ -1,12 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Masterbarang_model extends CI_Model {
+class Hutang_model extends CI_Model {
 
-	var $table = 'masterbarang';
-	var $column_order = array('KodeBarang','NamaBarang','Satuan','HPP','HargaJual',null); //set column field database for datatable orderable
-	var $column_search = array('KodeBarang','NamaBarang','Satuan','HPP','HargaJual'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('a.KodeBarang' => 'asc'); // default order 
+	var $table = 'pmb_sparepart';
+	var $column_order = array('no_pmb','supplier','tgl','tgl_tempo','Total',null); //set column field database for datatable orderable
+	var $column_search = array('no_pmb','supplier','tgl','tgl_tempo','Total'); //set column field database for datatable searchable just firstname , lastname , address are searchable
+	var $order = array('a.no_pmb' => 'asc'); // default order 
 
 	public function __construct()
 	{
@@ -17,17 +17,30 @@ class Masterbarang_model extends CI_Model {
 	private function _get_datatables_query()
 	{
 		
-		/*if($id=='CBG-000001'){
-			$this->db->select('*');
-			$this->db->from($this->table);
-		}else{
-			$this->db->select('*');
-			$this->db->from($this->table);
-			$this->db->where('cabang_id', $id);
-		}*/
-			$this->db->select('a.KodeBarang,a.NamaBarang,a.Satuan,a.HargaJual,a.Status,b.harga AS HPP');
+		/*SELECT
+a.no_pmb,
+a.no_sj,
+a.supplier,
+a.tgl,
+a.tgl_tempo,
+a.cara,
+a.keterangan,
+a.ppn,
+a.diskon,
+a.post,
+a.ket_cara,
+a.tgl_lunas,
+SUM(b.total)
+FROM
+pmb_sparepart AS a
+LEFT JOIN sparepart_pmb AS b ON b.no_pmb = a.no_pmb
+WHERE a.cara ='HUTANG'
+GROUP BY a.no_pmb*/
+			$this->db->select('a.no_pmb,a.no_sj,a.supplier,a.tgl,a.tgl_tempo,a.cara,a.keterangan,a.ppn,a.diskon,a.post,a.ket_cara,a.tgl_lunas,SUM(b.total)AS Total');
 			$this->db->from($this->table.' AS a');
-			$this->db->join('sparepart_pmb AS b', 'a.KodeBarang=b.kode','left');
+			$this->db->join('sparepart_pmb AS b', 'a.no_pmb=b.no_pmb','left');
+			$this->db->where('ket_cara','HUTANG');
+			$this->db->group_by('a.no_pmb');
         $i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 
@@ -87,7 +100,7 @@ class Masterbarang_model extends CI_Model {
 	public function get_by_id($id)
 	{
 		$this->db->from($this->table);
-		$this->db->where('KodeBarang',$id);
+		$this->db->where('no_pmb',$id);
 		$query = $this->db->get();
 
 		return $query->row();
@@ -107,7 +120,7 @@ class Masterbarang_model extends CI_Model {
 
 	public function delete_by_id($id)
 	{
-		$this->db->where('KodeBarang', $id);
+		$this->db->where('no_pmb', $id);
 		$this->db->delete($this->table);
 	}
 

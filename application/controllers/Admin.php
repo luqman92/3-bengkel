@@ -23,6 +23,7 @@ class Admin extends CI_Controller {
 		$this->load->model('Mutasibarang_model','mtb');
 		$this->load->model('Stokbrg_model','stk');
 		$this->load->model('Supplier_model','spp');
+		$this->load->model('Hutang_model','htg');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -451,7 +452,11 @@ class Admin extends CI_Controller {
             $row[] = $mb->NamaBarang;
             $row[] = $mb->Satuan;
             $row[] = $mb->HPP;
-            $row[] = $mb->HargaJual;
+            if(empty($mb->HargaJual)){
+            	$row[] = '<span class="label label-danger">Harga belum di set</span>';
+            }else{
+            	$row[] = $mb->HargaJual;/*<span class="label label-danger">Danger</span>*/
+            }
             
             //add html for action
             $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_masterbrg('."'".$mb->KodeBarang."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
@@ -906,21 +911,22 @@ class Admin extends CI_Controller {
 	/*AJAX TRX BENGKEL*/
 	public function ajax_list_trxbengkel()
     {
-    	$list = $this->trx->get_datatables();
+    	$trx_id = $this->session->userdata('trx_id');
+    	$list = $this->trx->get_datatables($trx_id);
         $data = array();
         $no = $_POST['start'];
         foreach ($list as $trx) {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $trx->KodeBarang;
-            $row[] = $trx->NamaBarang;
-            $row[] = $trx->HargaJual;
-            $row[] = $trx->Keluar;
-            $row[] = $trx->HargaJual*$trx->Keluar;
+            $row[] = $trx->jenis;
+            $row[] = $trx->keterangan;
+            $row[] = $trx->harga;
+            $row[] = $trx->qty;
+            $row[] = $trx->total;
             
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxbengkel('."'".$trx->KeyId."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxbengkel('."'".$trx->key."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  
             $data[] = $row;
         }
@@ -945,18 +951,57 @@ class Admin extends CI_Controller {
  
     public function ajax_add_trxbengkel()
     {
+    	$NomorTransaksi = $this->input->post('NomorTransaksi');
+    	$JenisTrx = $this->input->post('jenis');
+    	$keterangan = $this->input->post('Keterangan');
+    	$harga = $this->input->post('harga');
+    	$CustomerId = $this->input->post('CustomerId');
+    	$KodeBarang = $this->input->post('KodeBarang');
+    	$Keluar = $this->input->post('Keluar');
     	$user = $this->session->userdata('iduser');
     	$currdate = date('Y-m-d');
-        $data = array(
-        		'JenisTransaksi' => '2',
-                'NomorTransaksi' => $this->input->post('NomorTransaksi'),
-                'CustomerId' => $this->input->post('CustomerId'),
-                'KodeBarang' => $this->input->post('KodeBarang'),
-                'Keluar' => $this->input->post('Keluar'),
-                'TanggalTransaksi' => $currdate,
-                'UserId' => $user,
+
+    	if($JenisTrx=='PART'){
+    		$brg = $this->Model_admin->manualQuery('SELECT b.no_pmb,a.KodeBarang,a.KodeCabang,a.NamaBarang,a.Satuan,b.harga AS HPP,a.HargaJual,a.Status FROM masterbarang AS a LEFT JOIN sparepart_pmb AS b ON a.KodeBarang = b.kode WHERE KodeBarang="$KodeBarang"')->result();
+    		foreach ($brg as $dt) {
+    			$HJ = $dt->HargaJual;
+    			$HPP = $dt->HPP;
+    			$nopmb = $dt->no_pmb;
+    			$total = $Keluar * $HJ;
+
+    			$data = array(
+                'id' => $NomorTransaksi,
+        		'jenis' => $JenisTrx,
+        		'kode' => $KodeBarang,
+                'harga' => $HJ,
+                'qty' => $Keluar,
+                'total' => $total,
+                'harga_beli' => $HPP,
+                'harga_pokok' => $HPP,
+                'nopmb' => $nopmb,
+                'tgl' => $currdate,
+                'harga_jual' => $HJ,
+            );
+        	$insert = $this->trx->save($data);
+    		}
+    		
+    	}else{
+    		$data = array(
+                'id' => $NomorTransaksi,
+        		'jenis' => $JenisTrx,
+        		'kode' => $JenisTrx,
+                'keterangan' => $keterangan,
+                'harga' => $harga,
+                'qty' => $Keluar,
+                'total' => $harga,
+                'harga_beli' => '0',
+                'harga_pokok' => '0',
+                'tgl' => $currdate,
+                'harga_jual' => $harga,
             );
         $insert = $this->trx->save($data);
+    	}
+    	
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
@@ -1325,87 +1370,39 @@ VALUES ($max+1 , 'jim', 'sock')*/
 		$this->template_admin->load('template_admin','Moduls/biayaoperasional/index',$data);
 	}
 
-	public function retursparepart()
+	public function hutang()
 	{
-		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		$data['returs'] = $this->Model_admin->manualQuery('SELECT a.key_id,a.kode,a.diskripsi,a.qty,a.total,b.keterangan,b.status FROM retur AS a LEFT JOIN notaretur AS b ON b.id = a.id ORDER BY b.tgl DESC')->result();
-		$this->template_admin->load('template_admin','Moduls/retursparepart/index',$data);
+		$this->template_admin->load('template_admin','Moduls/hutang/index');
 	}
 
-	/*==================================================Administrasi===================================================*/
-
-	public function registrasi()
-	{	
-		$cbg = $this->session->userdata('cabang');
-		$data['regs'] = $this->Model_admin->manualQuery('SELECT customer_id,cabang_id,no_polisi,nama,alamat,hp FROM customer WHERE status="normal" AND cabang_id="'.$cbg.'" ORDER BY tanggal DESC')->result();
-		$this->template_admin->load('template_admin','Moduls/registrasi/index',$data);
-	}
-
-	public function act_rkunjungan()
-	{
-		/*echo "<pre>";
-			print_r($_POST);
-		echo "</pre>";*/
-
-		$cusid = $this->input->post('customer_id');
-		$sess_data['cstmid'] = $cusid;
-		$this->session->set_userdata($sess_data);
-		redirect('admin/kunjungan/'.$cusid);
-	}
-
-	public function kunjungan($id="")
-	{
-		if(!empty($id)){
-			$kdcs = $this->session->userdata('cstmid');
-			$cstm = $this->Model_admin->manualQuery('SELECT * FROM customer WHERE customer_id="'.$id.'"')->result();
-			$kjg = $this->Model_admin->manualQuery('SELECT a.kunjungan_id,a.kunjungan_date,a.cara_bayar,a.km,b.no_polisi,b.nama FROM kunjungan AS a LEFT JOIN customer AS b ON b.customer_id = a.customer_id WHERE a.status="normal" AND b.customer_id="'.$id.'"')->result();
-			$data = array(
-				'kdcss'=> $kdcs,
-				'cstms'=> $cstm,
-				'kjgs'=> $kjg,
-				);
-			$this->template_admin->load('template_admin','Moduls/kunjungan/index',$data);
-		}else{
-			$cusid = $this->session->userdata('cstmid');
-			if(!empty($cusid)){
-				redirect('admin/kunjungan/'.$cusid);
-			}else{
-			echo "REGISTRASI";
-			}
-		}
-	}
-	public function unsetcust()
-	{
-		$this->session->unset_userdata('trx_id');
-		redirect('admin/customer/');
-	}
-
-		/*AJAX TRX BENGKEL*/
-	public function ajax_list_kunjungan($id)
+		/*AJAX MasterBarang*/
+	public function ajax_list_hutang()
     {
-    	$list = $this->kjg->get_datatables($id);
+    	//$cbg = $this->session->userdata('cabang');
+    	//$list = $this->mb->get_datatables($cbg);
+    	$list = $this->htg->get_datatables();
         $data = array();
         $no = $_POST['start'];
-        foreach ($list as $kjg) {
+        foreach ($list as $htg) {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $kjg->kunjungan_date;
-            $row[] = $kjg->cara_bayar;
-            $row[] = $kjg->km;
-            $row[] = $kjg->kunjungan_status;
+            $row[] = $htg->no_pmb;
+            $row[] = $htg->supplier;
+            $row[] = $htg->tgl;
+            $row[] = $htg->tgl_tempo;
+            $row[] = $htg->Total;
             
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_person('."'".$kjg->kunjungan_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_person('."'".$kjg->kunjungan_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-success" href="javascript:void(0)" title="Hapus" onclick="update_lunas('."'".$htg->no_pmb."'".')"><i class="glyphicon glyphicon-check"></i> Lunasi</a>';
  
             $data[] = $row;
         }
  
         $output = array(
                         "draw" => $_POST['draw'],
-                        "recordsTotal" => $this->kjg->count_all(),
-                        "recordsFiltered" => $this->kjg->count_filtered(),
+                        "recordsTotal" => $this->htg->count_all(),
+                        "recordsFiltered" => $this->htg->count_filtered(),
                         "data" => $data,
                 );
         //output to json format
@@ -1413,61 +1410,52 @@ VALUES ($max+1 , 'jim', 'sock')*/
         echo json_encode($output);
     }
  
-    public function ajax_edit_kunjungan($id)
+    public function ajax_edit_hutang($id)
     {
-        $data = $this->kjg->get_by_id($id);
+        $data = $this->htg->get_by_id($id);
         header('Content-Type: application/json');
         echo json_encode($data);
     }
  
-    public function ajax_add_kunjungan()
+    public function ajax_add_hutang()
     {
+    	$KodeCabang = $this->session->userdata('cabang');
         $data = array(
-                'customer_id' => $this->input->post('customer_id'),
-                'kunjungan_id' => $this->input->post('kunjungan_id'),
-                'kunjungan_date' => $this->input->post('kunjungan_date'),
-                'cara_bayar' => $this->input->post('cara_bayar'),
-                'km' => $this->input->post('km'),
-                'cabang_id' => $this->input->post('cabang_id'),
-                'created_by' => $this->input->post('created_by'),
+                'KodeBarang' => $this->input->post('KodeBarang'),
+                'NamaBarang' => $this->input->post('NamaBarang'),
+                'Satuan' => $this->input->post('Satuan'),
+                'HPP' => $this->input->post('HPP'),
+                'HargaJual' => $this->input->post('HargaJual'),
+                'KodeCabang' => $KodeCabang,
             );
-        $insert = $this->kjg->save($data);
+        $datast = array(
+        	'KodeBarang' => $this->input->post('KodeBarang'),
+        	'StokAkhir' => '0',
+		);
+        $insert = $this->htg->save($data);
+        $insertstok = $this->Model_admin->create_data($datast,'stokbarang');
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
  
-    public function ajax_update_kunjungan()
+    public function ajax_update_hutang($id)
     {
         $data = array(
-                'customer_id' => $this->input->post('customer_id'),
-                'kunjungan_id' => $this->input->post('kunjungan_id'),
-                'kunjungan_date' => $this->input->post('kunjungan_date'),
-                'cara_bayar' => $this->input->post('cara_bayar'),
-                'km' => $this->input->post('km'),
-                'cabang_id' => $this->input->post('cabang_id'),
-                'created_by' => $this->input->post('created_by'),
+                'ket_cara' => 'LUNAS',
             );
-        $this->kjg->update(array('id' => $this->input->post('id')), $data);
+        $this->htg->update(array('no_pmb' => $id), $data);
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
  
-    public function ajax_delete_kunjungan($id)
-    {
-        $this->kjg->delete_by_id($id);
-        header('Content-Type: application/json');
-        echo json_encode(array("status" => TRUE));
-    }
-	/*AJAX TRX BENGKEL*/
+	/*AJAX MasterBarang*/
 
-	public function pelayanan($id=""){
-		if(!empty($id)){
-			echo $id;
-		}else{
-			echo "REGISTRASI";
-		}
+	public function retursparepart()
+	{
+		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
+		$data['returs'] = $this->Model_admin->manualQuery('SELECT a.key_id,a.kode,a.diskripsi,a.qty,a.total,b.keterangan,b.status FROM retur AS a LEFT JOIN notaretur AS b ON b.id = a.id ORDER BY b.tgl DESC')->result();
+		$this->template_admin->load('template_admin','Moduls/retursparepart/index',$data);
 	}
 
-	/*==================================================Administrasi===================================================*/
 
 }

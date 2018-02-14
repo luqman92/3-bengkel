@@ -1,12 +1,12 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Data Master Barang
-                        <small>List Data Master Barang</small>
+                        Data Hutang
+                        <small>List Data Hutang</small>
                     </h1>
                     <ol class="breadcrumb">
                         <li><a href="<?php echo base_url(); ?>index.php/admin"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li class="active">List Data Master Barang</li>
+                        <li class="active">List Data Hutang</li>
                     </ol>
                 </section>
 
@@ -19,18 +19,15 @@
                                     <!-- <h3 class="box-title">Data Table With Full Features</h3> -->                                    
                                 </div><!-- /.box-header -->
                                 <div class="box-body table-responsive">
-                                <!-- <a class="btn btn-primary" href="<?php echo base_url() ?>admin/addmerk"><i class="fa fa-plus-circle"></i> Data Sparepart</a> -->
-                                 <button class="btn btn-success" onclick="add_masterbrg()"><i class="glyphicon glyphicon-plus"></i> Master Barang</button>
-                                <br><br>
-                                    <table id="table" class="table table-bordered table-striped">
+                                   <table id="table" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode Barang</th>
-                                                <th>Nama Barang</th>
-                                                <th>Satuan</th>
-                                                <th>Harga Pokok</th>
-                                                <th>Harga Jual</th>
+                                                <th>No Pembelian</th>
+                                                <th>Supplier</th>
+                                                <th>Tanggal</th>
+                                                <th>Tgl Tempo</th>
+                                                <th>Total Terhutang</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -40,11 +37,11 @@
                                         <tfoot>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kode Barang</th>
-                                                <th>Nama Barang</th>
-                                                <th>Satuan</th>
-                                                <th>Harga Pokok</th>
-                                                <th>Harga Jual</th>
+                                                <th>No Pembeian</th>
+                                                <th>Supplier</th>
+                                                <th>Tanggal</th>
+                                                <th>Tgl Tempo</th>
+                                                <th>Total erhutang</th>
                                                 <th>Action</th>
                                                 
                                             </tr>
@@ -73,7 +70,7 @@ $(document).ready(function() {
  
         // Load data for the table's content from an Ajax source
         "ajax": {
-            "url": "<?php echo site_url('admin/ajax_list_mb')?>",
+            "url": "<?php echo site_url('admin/ajax_list_hutang')?>",
             "type": "POST"
         },
  
@@ -120,7 +117,7 @@ function edit_masterbrg(id)
  
     //Ajax Load data from ajax
     $.ajax({
-        url : "<?php echo site_url('admin/ajax_edit_mb/')?>" + id,
+        url : "<?php echo site_url('admin/ajax_edit_hutang/')?>" + id,
         type: "GET",
         dataType: "JSON",
         success: function(data)
@@ -155,9 +152,9 @@ function save()
     var url;
  
     if(save_method == 'add') {
-        url = "<?php echo site_url('admin/ajax_add_mb')?>";
+        url = "<?php echo site_url('admin/ajax_add_hutang')?>";
     } else {
-        url = "<?php echo site_url('admin/ajax_update_mb')?>";
+        url = "<?php echo site_url('admin/ajax_update_hutang')?>";
     }
  
     // ajax adding data to database
@@ -191,13 +188,13 @@ function save()
     });
 }
  
-function delete_masterbrg(id)
+function update_lunas(id)
 {
-    if(confirm('Are you sure delete this data?'))
+    if(confirm('Melunasi tagihan?'))
     {
         // ajax delete data to database
         $.ajax({
-            url : "<?php echo site_url('admin/ajax_delete_mb')?>/"+id,
+            url : "<?php echo site_url('admin/ajax_update_hutang')?>/"+id,
             type: "POST",
             dataType: "JSON",
             success: function(data)

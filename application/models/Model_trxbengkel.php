@@ -3,10 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  
 class Model_trxbengkel extends CI_Model {
     
-    var $table = 'mutasibarang';
-    var $column_order = array(null,'KodeBarang','NamaBarang','HargaJual','NomorTransaksi','qty','pot','total'); //set column field database for datatable orderable
-    var $column_search = array('kode','jenis','keterangan'); //set column field database for datatable searchable just kode , jenis , address are searchable
-    var $order = array('a.KodeBarang' => 'desc'); // default order 
+    var $table = 'detil_transaksi';
+    var $column_order = array(null,'kode','keterangan','harga','qty','total',null); //set column field database for datatable orderable
+    var $column_search = array('kode','keterangan','harga'); //set column field database for datatable searchable just kode , jenis , address are searchable
+    var $order = array('key' => 'desc'); // default order 
  
     public function __construct()
     {
@@ -14,14 +14,17 @@ class Model_trxbengkel extends CI_Model {
         $this->load->database();
     }
  
-    private function _get_datatables_query()
+    private function _get_datatables_query($id="")
     {
-            $this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Keluar,a.KeyId');
+            /*$this->db->select('b.NamaBarang,b.HargaJual,a.JenisTransaksi,a.NomorTransaksi,a.TanggalTransaksi,a.KodeBarang,c.nama,a.CustomerId,a.Keluar,a.KeyId');
             $this->db->from($this->table.' AS a');
             $this->db->join('masterbarang AS b', 'b.KodeBarang=a.KodeBarang','left');
             $this->db->join('customer AS c', 'c.customer_id=a.CustomerId','left');
             $this->db->where('a.JenisTransaksi','2');
-            $this->db->where('a.status','new');
+            $this->db->where('a.status','new');*/
+            $this->db->select('*');
+            $this->db->from($this->table);
+            $this->db->where('id',$id);
         $i = 0;
      
         foreach ($this->column_search as $item) // loop column 
@@ -56,9 +59,9 @@ class Model_trxbengkel extends CI_Model {
         }
     }
  
-    function get_datatables()
+    function get_datatables($id="")
     {
-        $this->_get_datatables_query();
+        $this->_get_datatables_query($id);
         if($_POST['length'] != -1)
         $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
@@ -81,7 +84,7 @@ class Model_trxbengkel extends CI_Model {
     public function get_by_id($id)
     {
         $this->db->from($this->table);
-        $this->db->where('KeyId',$id);
+        $this->db->where('key',$id);
         $query = $this->db->get();
  
         return $query->row();
@@ -101,7 +104,7 @@ class Model_trxbengkel extends CI_Model {
  
     public function delete_by_id($id)
     {
-        $this->db->where('KeyId', $id);
+        $this->db->where('key', $id);
         $this->db->delete($this->table);
     }
  

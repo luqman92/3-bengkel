@@ -147,7 +147,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>No</th>
-                                                                <th>Kode Barang</th>
+                                                                <th>Jenis</th>
                                                                 <th>Keterangan</th>
                                                                 <th>@Harga (Rp)</th>
                                                                 <th>Qty</th>
@@ -162,7 +162,7 @@
                                                         <tfoot>
                                                             <tr>
                                                                 <th>No</th>
-                                                                <th>Kode Barang</th>
+                                                                <th>Jenis</th>
                                                                 <th>Keterangan</th>
                                                                 <th>@Harga (Rp)</th>
                                                                 <th>Qty</th>
@@ -177,7 +177,7 @@
 <div class="col-md-3">
 
                                                     <form id='form1' action="<?=site_url('admin/act_trxbengkelup')?>" method="post">
-                                                        <div class="form-group">
+                                                        <!-- <div class="form-group">
                                                             <label>Total</label>
                                                             <input class="txt form-control" type="text" id="total" onchange="hitung()" value="10000">
                                                         </div>
@@ -190,7 +190,7 @@
                                                         <div class="form-group">
                                                             <label>Kembalian</label>
                                                             <input class="form-control" type="text" id="kembalian">
-                                                        </div>
+                                                        </div> -->
                                                         <div class="form-group">
                                                             <label></label>
                                                             <input type="hidden" name="NomorTransaksi" value="<?=$KdTrx?>"><br><br>
@@ -280,16 +280,6 @@ jQuery(document).ready(function() {
  
     });
  
-    //datepicker
-   /* $('.datepicker').datepicker({
-        autoclose: true,
-        format: "yyyy-mm-dd",
-        todayHighlight: true,
-        orientation: "top auto",
-        todayBtn: true,
-        todayHighlight: true,  
-    });*/
- 
 });
  
  
@@ -340,9 +330,9 @@ function edit_trxbengkel(id)
  
 function reload_table()
 {
-    //alert('TEST') ;
+    
     table.ajax.reload(null,false); //reload datatable ajax 
-    document.location.reload();
+    //document.location.reload();
 }
  
 function save()
@@ -410,7 +400,16 @@ function delete_trxbengkel(id)
  
     }
 }
- 
+
+
+/*function myFunction() {
+    var x = document.getElementById("myDIV");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}*/
 </script>
  
 <!-- Bootstrap modal -->
@@ -427,8 +426,27 @@ function delete_trxbengkel(id)
                     <input type="hidden" value="<?=$KdTrx?>" name="NomorTransaksi"/>
                     <input type="hidden" value="<?=$customer_id?>" name="CustomerId"/>
                     <div class="form-body">
-                        
+
+                        <!-- <div class="form-group">
+                            <label class="control-label col-md-3">Part / Service</label>
+                            <div class="col-md-9">
+                                <label>Part</label>
+                                <input class="form-control" type="radio" name="jenis" value="PART"> &nbsp;&nbsp;
+                            <label>Service</label>
+                                <input class="form-control" type="radio" name="jenis" value="SERVIS">
+                            </div>
+                        </div> -->
                         <div class="form-group">
+                        <label class="control-label col-md-3">Part / Service</label>
+                            <div class="col-md-9">
+                            <select class="form-control" name="jenis">
+                                <option value="">-- Pilih --</option>
+                                <option value="PART">PART</option>
+                                <option value="SERVIS">SERVIS</option>
+                            </select>
+                            </div>
+                        </div>
+                         <div class="form-group">
                             <label class="control-label col-md-3">Nama Barang</label>
                             <div class="col-md-9">
                                 <select name="KodeBarang" class="form-control">
@@ -445,10 +463,26 @@ function delete_trxbengkel(id)
                             </div>
                         </div>
                         
+                         <div class="form-group">
+                            <label class="control-label col-md-3">Keterangan Jasa</label>
+                            <div class="col-md-9">
+                                <input name="Keterangan" placeholder="" class="form-control" type="text">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+
+                         <div class="form-group">
+                            <label class="control-label col-md-3">Harga Jasa</label>
+                            <div class="col-md-9">
+                                <input name="harga" placeholder="" class="form-control" type="number">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label class="control-label col-md-3">Jumlah</label>
-                            <div class="col-md-9">
-                                <input name="Keluar" placeholder="" class="form-control" type="text">
+                            <div class="col-md-2">
+                                <input name="Keluar" placeholder="" class="form-control" type="number" value="1">
                                 <span class="help-block"></span>
                             </div>
                         </div>
