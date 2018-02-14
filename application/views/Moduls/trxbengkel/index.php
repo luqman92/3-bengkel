@@ -57,15 +57,15 @@
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Tgl Transaksi</label>
-                                                <input class="form-control" type="text" name="tgl" value="<?=$dtrx->tgl?>">
+                                                <input class="form-control" type="date" name="tgl" value="<?=$dtrx->tgl?>">
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Jatuh Tempo</label>
-                                                <input class="form-control" type="text" name="tgl_tempo" value="<?=$dtrx->tgl_tempo?>">
+                                                <input class="form-control" type="date" name="tgl_tempo" value="<?=$dtrx->tgl_tempo?>">
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Tgl Lunas</label>
-                                                <input class="form-control" type="text" name="tgl_lunas" value="<?=$dtrx->tgl_lunas?>">
+                                                <input class="form-control" type="date" name="tgl_lunas" value="<?=$dtrx->tgl_lunas?>">
                                             </div>
                                         </div>
                                     </div>
