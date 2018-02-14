@@ -332,7 +332,7 @@ function reload_table()
 {
     
     table.ajax.reload(null,false); //reload datatable ajax 
-    //document.location.reload();
+    document.location.reload();
 }
  
 function save()
@@ -422,7 +422,7 @@ function delete_trxbengkel(id)
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
-                    <input type="hidden" value="" name="KeyId"/>
+                    <input type="hidden" value="" name="key"/>
                     <input type="hidden" value="<?=$KdTrx?>" name="NomorTransaksi"/>
                     <input type="hidden" value="<?=$customer_id?>" name="CustomerId"/>
                     <div class="form-body">

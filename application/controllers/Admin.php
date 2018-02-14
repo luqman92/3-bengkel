@@ -962,28 +962,40 @@ class Admin extends CI_Controller {
     	$currdate = date('Y-m-d');
 
     	if($JenisTrx=='PART'){
-    		$brg = $this->Model_admin->manualQuery('SELECT b.no_pmb,a.KodeBarang,a.KodeCabang,a.NamaBarang,a.Satuan,b.harga AS HPP,a.HargaJual,a.Status FROM masterbarang AS a LEFT JOIN sparepart_pmb AS b ON a.KodeBarang = b.kode WHERE KodeBarang="$KodeBarang"')->result();
-    		foreach ($brg as $dt) {
-    			$HJ = $dt->HargaJual;
-    			$HPP = $dt->HPP;
-    			$nopmb = $dt->no_pmb;
-    			$total = $Keluar * $HJ;
-
-    			$data = array(
+    		/*$query = $this->Model_admin->manualQuery('SELECT * FROM sparepart WHERE kode="'.$kode.'"');
+		$row = $query->row_array();
+		$hargax = $row['harga'];
+		$total = $hargax*$qty;
+		$data = array(
+			'kode'=>$kode,
+			'qty'=>$qty,
+			'harga'=>$hargax,
+			'total'=>$total,
+			'kondisi'=>'new',
+			);*/
+    		$query = $this->Model_admin->manualQuery('SELECT b.no_pmb,a.KodeBarang,a.KodeCabang,a.NamaBarang,a.Satuan,b.harga AS HPP,a.HargaJual,a.Status FROM masterbarang AS a LEFT JOIN sparepart_pmb AS b ON a.KodeBarang = b.kode WHERE KodeBarang="'.$KodeBarang.'"');
+    		$row = $query->row_array();
+    		$NamaBarang = $row['NamaBarang'];
+    		$HJ = $row['HargaJual'];
+    		$HPP = $row['HPP'];
+    		$no_pmb = $row['no_pmb'];
+    		$total = $HPP * $Keluar;
+    		
+    		$data = array(
                 'id' => $NomorTransaksi,
         		'jenis' => $JenisTrx,
+                'keterangan' => $NamaBarang,
         		'kode' => $KodeBarang,
                 'harga' => $HJ,
                 'qty' => $Keluar,
                 'total' => $total,
                 'harga_beli' => $HPP,
                 'harga_pokok' => $HPP,
-                'nopmb' => $nopmb,
+                'nopmb' => $no_pmb,
                 'tgl' => $currdate,
                 'harga_jual' => $HJ,
             );
         	$insert = $this->trx->save($data);
-    		}
     		
     	}else{
     		$data = array(
