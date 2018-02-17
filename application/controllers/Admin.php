@@ -25,6 +25,7 @@ class Admin extends CI_Controller {
 		$this->load->model('Stokbrg_model','stk');
 		$this->load->model('Supplier_model','spp');
 		$this->load->model('Hutang_model','htg');
+		$this->load->model('Karyawan_model','kar');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -194,7 +195,7 @@ class Admin extends CI_Controller {
 		$this->template_admin->load('template_admin','Moduls/supplier/index',$data);
 	}
 
-	/*AJAX Customer*/
+	/*AJAX Supplier*/
 	public function ajax_list_suplier()
     {
     	$cbg = $this->session->userdata('cabang');
@@ -277,7 +278,7 @@ class Admin extends CI_Controller {
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
-	/*AJAX Customer*/
+	/*AJAX Supplier*/
 
 		public function customer()
 	{
@@ -468,9 +469,100 @@ class Admin extends CI_Controller {
 	public function karyawan()
 	{
 		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		$data['karyawans'] = $this->Model_admin->manualQuery('SELECT * FROM karyawan')->result();
+		$jabatan = $this->Model_admin->manualQuery('SELECT * FROM jabatan')->result();
+		$data = array(
+			'jabatan'=>$jabatan,
+			);
 		$this->template_admin->load('template_admin','Moduls/karyawan/index',$data);
 	}
+
+	/*AJAX Karyawan*/
+	public function ajax_list_karyawan()
+    {
+    	$list = $this->kar->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $kar) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $kar->noktp;
+            $row[] = $kar->nama;
+            $row[] = "Tlp. ".$kar->tlp." / Hp. ".$kar->hp;
+            $row[] = $kar->jabatan;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_karyawan('."'".$kar->karyawan_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_karyawan('."'".$kar->karyawan_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->kar->count_all(),
+                        "recordsFiltered" => $this->kar->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_karyawan($id)
+    {
+        $data = $this->kar->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_karyawan()
+    {
+    	/*$('[name="noktp"]').val(data.noktp);
+            $('[name="nama"]').val(data.nama);
+            $('[name="alamat"]').val(data.alamat);
+            $('[name="tlp"]').val(data.tlp);
+            $('[name="hp"]').val(data.hp);
+            $('[name="email"]').val(data.email);
+            $('[name="jabatan"]').val(data.jabatan);*/
+    	$data = array(
+                'noktp' => $this->input->post('noktp'),
+                'nama' => $this->input->post('nama'),
+                'alamat' => $this->input->post('alamat'),
+                'tlp' => $this->input->post('tlp'),
+                'hp' => $this->input->post('hp'),
+                'email' => $this->input->post('email'),
+                'jabatan' => $this->input->post('jabatan')
+            );
+        
+        $insert = $this->kar->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_karyawan()
+    {
+        $data = array(
+                'noktp' => $this->input->post('noktp'),
+                'nama' => $this->input->post('nama'),
+                'alamat' => $this->input->post('alamat'),
+                'tlp' => $this->input->post('tlp'),
+                'hp' => $this->input->post('hp'),
+                'email' => $this->input->post('email'),
+                'jabatan' => $this->input->post('jabatan')
+            );
+        $this->kar->update(array('karyawan_id' => $this->input->post('karyawan_id')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_karyawan($id)
+    {
+        $this->kar->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX Karyawan*/
 
 	public function jabatan()
 	{

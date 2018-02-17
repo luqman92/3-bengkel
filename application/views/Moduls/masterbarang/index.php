@@ -86,17 +86,6 @@ $(document).ready(function() {
         ],
  
     });
- 
-    //datepicker
-   /* $('.datepicker').datepicker({
-        autoclose: true,
-        format: "yyyy-mm-dd",
-        todayHighlight: true,
-        orientation: "top auto",
-        todayBtn: true,
-        todayHighlight: true,  
-    });*/
- 
 });
  
  
