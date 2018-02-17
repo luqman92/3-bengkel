@@ -34,4 +34,5 @@ class Model_admin extends CI_Model{
 		$this->db->insert('mytable');
 		// gives INSERT INTO mytable (field) VALUES (field+1)
     }
+
 }

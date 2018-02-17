@@ -22,7 +22,7 @@ class Model_trxbengkel extends CI_Model {
             $this->db->join('customer AS c', 'c.customer_id=a.CustomerId','left');
             $this->db->where('a.JenisTransaksi','2');
             $this->db->where('a.status','new');*/
-            $this->db->select('*');
+            $this->db->select('a.key,a.jenis,a.harga,a.qty,a.total,a.keterangan');
             $this->db->from($this->table.' AS a');
             $this->db->join('transaksi AS b', 'a.id=b.id','left');
             $this->db->where('b.status','normal');

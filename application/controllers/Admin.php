@@ -13,6 +13,7 @@ class Admin extends CI_Controller {
             redirect('login');
         };*/
 		$this->load->model('Model_admin');
+		$this->load->helper('format_angka');
 		$this->load->model('Model_trxbengkel','trx');
 		$this->load->model('Cabang_model','cbg');
 		$this->load->model('Customer_model','cstm');
@@ -98,6 +99,7 @@ class Admin extends CI_Controller {
 													tgl_lunas = '".$currdate."'
 												AND
 													a.status='final'")->result();
+		//$FormatAngka = $this->Model_admin->format_angka();
 		$data = array(
 			'trxbengkels' => $trxbengkel,
 			'customers' => $customer,
@@ -108,6 +110,7 @@ class Admin extends CI_Controller {
 			'modal_part' => $modal_part,
 			'omzet' => $omzet,
 			'unit' => $unit,
+			//'FormatAngka' => $FormatAngka,
 			);
 		 $this->template_admin->load('template_admin','Moduls/home',$data);
 	}
@@ -758,12 +761,12 @@ class Admin extends CI_Controller {
     }
 
 /*
------------------------------------------------------END MASTER DATA-----------------------------------------------------
+------------------------------------------------END MASTER DATA-----------------------------------------------------
 */
 
 
 /*
------------------------------------------------------KEUANGAN-------------------------------------------------------------
+------------------------------------------------KEUANGAN-------------------------------------------------------------
 */
 
 
@@ -907,17 +910,7 @@ class Admin extends CI_Controller {
 	{
 		$NomorTransaksi = $this->input->post('NomorTransaksi');
 		$Jenis = $this->input->post('Jenis');
-		/*$mutasibarang = $this->Model_admin->manualQuery('SELECT * FROM mutasibarang WHERE NomorTransaksi="'.$NomorTransaksi.'"')->result();
-		foreach ($mutasibarang as $data) {
-			$NomorTransaksi = $data->NomorTransaksi;
-			$KeyId = $data->KeyId;
-			$KodeBarang = $data->KodeBarang;
-			$Keluar = $data->Keluar;
-			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir-"'.$Keluar.'" WHERE KodeBarang="'.$KodeBarang.'"');
-
-			$update = $this->Model_admin->manualQuery('UPDATE mutasibarang SET status="normal" WHERE NomorTransaksi="'.$NomorTransaksi.'"');
-			$update2 = $this->Model_admin->manualQuery('UPDATE transaksi SET status="final" WHERE id="'.$NomorTransaksi.'"');
-		}*/
+		
 		if($Jenis == 'SERVIS'){
 			$UpdateJenis = $this->Model_admin->manualQuery('UPDATE transaksi SET status="final" WHERE id="'.$NomorTransaksi.'"');
 		}else{
@@ -930,6 +923,7 @@ class Admin extends CI_Controller {
 			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir-"'.$Keluar.'" WHERE KodeBarang="'.$KodeBarang.'"');
 		}
 	}
+	$this->session->unset_userdata('trx_id');
 	redirect('admin/trxlist');
 	
 }

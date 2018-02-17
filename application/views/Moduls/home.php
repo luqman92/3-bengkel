@@ -122,9 +122,9 @@
                                         foreach($laba_servis AS $lbsp):
                                             $TLServis=$lbsp->tlaba_servis;
                                             if(!empty($lbsp->tgl_lunas)){
-                                                echo $lbsp->tlaba_servis;
+                                                echo "Rp. ".format_angka($lbsp->tlaba_servis);
                                             }else{
-                                                echo "0";
+                                                echo "Rp. 0";
                                             }
                                         endforeach;
                                         ?>
@@ -151,9 +151,9 @@
                                        foreach($laba_sparepart AS $lbspp):
                                         $TLpart = $lbspp->tlaba_part;
                                             if(!empty($lbspp->tgl_lunas)){
-                                                echo $lbspp->tlaba_part;
+                                                echo "Rp. ".format_angka($lbspp->tlaba_part);
                                             }else{
-                                                echo "0";
+                                                echo "Rp. 0";
                                             }
                                         endforeach;
                                         ?>
@@ -179,9 +179,9 @@
                                         <?php
                                         $TL = $TLServis+$TLpart;
                                             if(!empty($TL)){
-                                                echo $TL;
+                                                echo "Rp. ".format_angka($TL);
                                             }else{
-                                                echo "0";
+                                                echo "Rp. 0";
                                             }
                                         ?>
                                     </h3>
@@ -208,9 +208,9 @@
                                        foreach($modal_part AS $mp):
                                         $TModalPart= $mp->TModalPart;
                                             if(!empty($mp->tgl_lunas)){
-                                                echo $mp->TModalPart;
+                                                echo "Rp. ".format_angka($mp->TModalPart);
                                             }else{
-                                                echo "0";
+                                                echo "Rp. 0";
                                             }
                                         endforeach;
                                         ?>
@@ -240,9 +240,9 @@
                                         <?php
                                         $TOmzet = $TL+$TModalPart;
                                             if(!empty($TOmzet)){
-                                                echo $TOmzet;
+                                                echo "Rp. ".format_angka($TOmzet);
                                             }else{
-                                                echo "0";
+                                                echo "Rp. 0";
                                             }
                                         ?>
                                     </h3>
