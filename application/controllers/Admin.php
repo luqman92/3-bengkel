@@ -37,6 +37,7 @@ class Admin extends CI_Controller {
 		$label = $this->Model_admin->manualQuery("SELECT count(id_label) AS jml FROM label")->result();
 		$kolumnis = $this->Model_admin->manualQuery("SELECT count(iduser) AS jml FROM user WHERE level='2'")->result();
 		*/
+		$currdate = date('Y-m-d');
 		$trxbengkel = $this->Model_admin->manualQuery("SELECT count(id) AS jml FROM transaksi WHERE tgl=now()")->result();
 		$customer = $this->Model_admin->manualQuery("SELECT count(customer_id) AS jml FROM customer")->result();
 		$karyawan = $this->Model_admin->manualQuery("SELECT count(karyawan_id) AS jml FROM karyawan")->result();
@@ -49,9 +50,11 @@ class Admin extends CI_Controller {
 															transaksi AS a
 															LEFT JOIN detil_transaksi AS b ON a.id = b.id 
 														WHERE
-															a.tgl_lunas = '2018-01-03'
+															a.tgl_lunas = '".$currdate."'
 														AND
-														b.jenis='SERVIS'")->result();
+															b.jenis='SERVIS'
+														AND
+															a.status='final'")->result();
 		$laba_sparepart = $this->Model_admin->manualQuery("SELECT
 																a.tgl_lunas,
 																SUM( b.total ) AS tlaba_part 
@@ -59,9 +62,11 @@ class Admin extends CI_Controller {
 																transaksi AS a
 																LEFT JOIN detil_transaksi AS b ON a.id = b.id 
 															WHERE
-																a.tgl_lunas = '2018-01-03'
+																a.tgl_lunas = '".$currdate."'
 															AND
-															b.jenis='PART'")->result();
+																b.jenis='PART'
+															AND
+																a.status='final'")->result();
 		$modal_part = $this->Model_admin->manualQuery("SELECT
 															a.tgl_lunas,
 															b.jenis,
@@ -70,8 +75,11 @@ class Admin extends CI_Controller {
 															transaksi AS a
 															LEFT JOIN detil_transaksi AS b ON a.id = b.id 
 														WHERE
-															a.tgl_lunas = '2018-01-03' 
-															AND b.jenis = 'PART'")->result();
+															a.tgl_lunas = '".$currdate."' 
+														AND 
+															b.jenis = 'PART'
+														AND
+															a.status='final'")->result();
 		$omzet = $this->Model_admin->manualQuery("SELECT
 													a.tgl_lunas,
 													SUM( b.total ) AS TOmzet 
@@ -79,13 +87,17 @@ class Admin extends CI_Controller {
 													transaksi AS a
 													LEFT JOIN detil_transaksi AS b ON a.id = b.id 
 												WHERE
-													a.tgl_lunas = '2018-01-03'")->result();
+													a.tgl_lunas = '".$currdate."'
+												AND
+													a.status='final'")->result();
 		$unit = $this->Model_admin->manualQuery("SELECT
-													count( a.nopol ) AS Unit 
+													a.tgl_lunas,count( a.nopol ) AS Unit 
 												FROM
 													`transaksi` AS a 
 												WHERE
-													tgl_lunas = '2018-01-03'")->result();
+													tgl_lunas = '".$currdate."'
+												AND
+													a.status='final'")->result();
 		$data = array(
 			'trxbengkels' => $trxbengkel,
 			'customers' => $customer,
@@ -100,7 +112,7 @@ class Admin extends CI_Controller {
 		 $this->template_admin->load('template_admin','Moduls/home',$data);
 	}
 /*
--------------------------------------------------------------MASTER DATA----------------------------------------------------
+----------------------------------------------------MASTER DATA----------------------------------------------------
 */
 	public function merkmotor()
 	{
@@ -282,6 +294,11 @@ class Admin extends CI_Controller {
 				'mtrs' => $mtr,
 				); 
 		$this->template_admin->load('template_admin','Moduls/customer/index',$data);
+	}
+	function unsetcust()
+	{
+		$this->session->unset_userdata('trx_id');
+		redirect('admin/customer');
 	}
 
 	/*AJAX Customer*/
@@ -889,7 +906,8 @@ class Admin extends CI_Controller {
 	function act_trxbengkelup()
 	{
 		$NomorTransaksi = $this->input->post('NomorTransaksi');
-		$mutasibarang = $this->Model_admin->manualQuery('SELECT * FROM mutasibarang WHERE NomorTransaksi="'.$NomorTransaksi.'"')->result();
+		$Jenis = $this->input->post('Jenis');
+		/*$mutasibarang = $this->Model_admin->manualQuery('SELECT * FROM mutasibarang WHERE NomorTransaksi="'.$NomorTransaksi.'"')->result();
 		foreach ($mutasibarang as $data) {
 			$NomorTransaksi = $data->NomorTransaksi;
 			$KeyId = $data->KeyId;
@@ -897,15 +915,24 @@ class Admin extends CI_Controller {
 			$Keluar = $data->Keluar;
 			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir-"'.$Keluar.'" WHERE KodeBarang="'.$KodeBarang.'"');
 
-			/*$data = array(
-				'KeyId'=>$KeyId,
-				);*/
 			$update = $this->Model_admin->manualQuery('UPDATE mutasibarang SET status="normal" WHERE NomorTransaksi="'.$NomorTransaksi.'"');
 			$update2 = $this->Model_admin->manualQuery('UPDATE transaksi SET status="final" WHERE id="'.$NomorTransaksi.'"');
+		}*/
+		if($Jenis == 'SERVIS'){
+			$UpdateJenis = $this->Model_admin->manualQuery('UPDATE transaksi SET status="final" WHERE id="'.$NomorTransaksi.'"');
+		}else{
+			$UpdateJenis = $this->Model_admin->manualQuery('UPDATE transaksi SET status="final" WHERE id="'.$NomorTransaksi.'"');
+			$detil_transaksi = $this->Model_admin->manualQuery('SELECT * FROM detil_transaksi WHERE id="'.$NomorTransaksi.'" AND jenis="PART"')->result();
+		foreach ($detil_transaksi as $data) {
+			$NomorTransaksi = $data->NomorTransaksi;
+			$KodeBarang = $data->kode;
+			$Keluar = $data->qty;
+			$stokbarangup = $this->Model_admin->manualQuery('UPDATE stokbarang SET StokAkhir=StokAkhir-"'.$Keluar.'" WHERE KodeBarang="'.$KodeBarang.'"');
 		}
-		
-	redirect('admin/trxlist');
 	}
+	redirect('admin/trxlist');
+	
+}
 	public function trxbengkel($id="")
 	{
 		$trx_id = $this->session->userdata('trx_id');
@@ -915,6 +942,7 @@ class Admin extends CI_Controller {
 													a.nopol,
 													a.customer_id,
 													a.km,
+													a.keluhan,
 													a.keluhan,
 													a.keluhan1,
 													a.id_mekanik,
@@ -934,11 +962,13 @@ class Admin extends CI_Controller {
 													a.cust,
 													a.tgl_tempo,
 													a.tgl_lunas,
-													b.no_polisi 
+													b.no_polisi, 
+													c.jenis 
 												FROM
 													transaksi AS a
 													LEFT JOIN customer AS b ON a.customer_id = b.customer_id
-												WHERE id="'.$trx_id.'"')->result();
+													LEFT JOIN detil_transaksi AS c ON a.id=c.id
+												WHERE a.id="'.$trx_id.'"')->result();
 			$mekanik = $this->Model_admin->manualQuery('SELECT * FROM karyawan WHERE id_jabatan="MK"')->result();
 			$dtmb = $this->Model_admin->manualQuery('SELECT
 												a.KodeBarang,
@@ -1017,24 +1047,13 @@ class Admin extends CI_Controller {
     	$currdate = date('Y-m-d');
 
     	if($JenisTrx=='PART'){
-    		/*$query = $this->Model_admin->manualQuery('SELECT * FROM sparepart WHERE kode="'.$kode.'"');
-		$row = $query->row_array();
-		$hargax = $row['harga'];
-		$total = $hargax*$qty;
-		$data = array(
-			'kode'=>$kode,
-			'qty'=>$qty,
-			'harga'=>$hargax,
-			'total'=>$total,
-			'kondisi'=>'new',
-			);*/
     		$query = $this->Model_admin->manualQuery('SELECT b.no_pmb,a.KodeBarang,a.KodeCabang,a.NamaBarang,a.Satuan,b.harga AS HPP,a.HargaJual,a.Status FROM masterbarang AS a LEFT JOIN sparepart_pmb AS b ON a.KodeBarang = b.kode WHERE KodeBarang="'.$KodeBarang.'"');
     		$row = $query->row_array();
     		$NamaBarang = $row['NamaBarang'];
     		$HJ = $row['HargaJual'];
     		$HPP = $row['HPP'];
     		$no_pmb = $row['no_pmb'];
-    		$total = $HPP * $Keluar;
+    		$total = $HJ * $Keluar;
     		
     		$data = array(
                 'id' => $NomorTransaksi,

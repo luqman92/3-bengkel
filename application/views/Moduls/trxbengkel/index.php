@@ -34,8 +34,10 @@
                                                 <div class="box-body">
                                     <?php
                                     $customer_id = "";
+                                    $Jenis = "";
                                     foreach($dtrxs AS $dtrx){
                                         $customer_id = $dtrx->customer_id;
+                                        $Jenis = $dtrx->jenis;
                                     ?>
                                 <form action="<?php echo site_url('admin/trxbengkelup')?>" method="post">
                                     <a class="btn btn-success" href="<?=site_url('admin/unsetcust')?>"><i class="glyphicon glyphicon-plus"></i> Pilih Customer</a>
@@ -194,6 +196,7 @@
                                                         <div class="form-group">
                                                             <label></label>
                                                             <input type="hidden" name="NomorTransaksi" value="<?=$KdTrx?>"><br><br>
+                                                            <input type="hidden" name="Jenis" value="<?=$Jenis?>"><br><br>
                                                             <button style="float:right" class="btn btn-success" type="submit">Simpan</button>
                                                         </div>
                                                     </form>

@@ -6,7 +6,7 @@ class Model_trxbengkel extends CI_Model {
     var $table = 'detil_transaksi';
     var $column_order = array(null,'kode','keterangan','harga','qty','total',null); //set column field database for datatable orderable
     var $column_search = array('kode','keterangan','harga'); //set column field database for datatable searchable just kode , jenis , address are searchable
-    var $order = array('key' => 'desc'); // default order 
+    var $order = array('a.key' => 'desc'); // default order 
  
     public function __construct()
     {
@@ -23,8 +23,10 @@ class Model_trxbengkel extends CI_Model {
             $this->db->where('a.JenisTransaksi','2');
             $this->db->where('a.status','new');*/
             $this->db->select('*');
-            $this->db->from($this->table);
-            $this->db->where('id',$id);
+            $this->db->from($this->table.' AS a');
+            $this->db->join('transaksi AS b', 'a.id=b.id','left');
+            $this->db->where('b.status','normal');
+            $this->db->where('a.id',$id);
         $i = 0;
      
         foreach ($this->column_search as $item) // loop column 

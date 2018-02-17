@@ -100,7 +100,7 @@
                                     </p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-person-add"></i>
+                                    <i class="fa fa-user"></i>
                                 </div>
                                 <a href="#" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
@@ -118,8 +118,14 @@
                                 <div class="inner">
                                     <h3>
                                         <?php
+                                        $TLServis="";
                                         foreach($laba_servis AS $lbsp):
-                                            echo $lbsp->tlaba_servis;
+                                            $TLServis=$lbsp->tlaba_servis;
+                                            if(!empty($lbsp->tgl_lunas)){
+                                                echo $lbsp->tlaba_servis;
+                                            }else{
+                                                echo "0";
+                                            }
                                         endforeach;
                                         ?>
                                     </h3>
@@ -128,10 +134,10 @@
                                     </p>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-book"></i>
+                                    <i class="fa fa-money"></i>
                                 </div>
                                 <a href="#" class="small-box-footer">
-                                    <!-- More info <i class="fa fa-arrow-circle-right"></i> -->
+                                    LABA SERVIS
                                 </a>
                             </div>
                         </div><!-- ./col -->
@@ -141,8 +147,14 @@
                                 <div class="inner">
                                     <h3>
                                         <?php
+                                        $TLpart="";
                                        foreach($laba_sparepart AS $lbspp):
-                                            echo $lbspp->tlaba_part;
+                                        $TLpart = $lbspp->tlaba_part;
+                                            if(!empty($lbspp->tgl_lunas)){
+                                                echo $lbspp->tlaba_part;
+                                            }else{
+                                                echo "0";
+                                            }
                                         endforeach;
                                         ?>
                                     </h3>
@@ -151,55 +163,37 @@
                                     </p>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-book"></i>
+                                    <i class="fa fa-money"></i>
                                 </div>
                                 <a href="#" class="small-box-footer">
-                                    <!-- More info <i class="fa fa-arrow-circle-right"></i> -->
+                                    LABA SPAREPART
                                 </a>
                             </div>
-                        </div><!-- ./col -->
-<!--                         <div class="col-lg-3 col-xs-6">
-                            <div class="small-box bg-red">
-                                <div class="inner">
-                                    <h3>
-                                        <?php
-                                        foreach($modal_part AS $mp):
-                                            echo $mp->TModalPart;
-                                        endforeach;
-                                        ?>
-                                    </h3>
-                                    <p>
-                                        Modal Sparepart
-                                    </p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fa fa-tasks fa-fw"></i>
-                                </div>
-                                <a href="#" class="small-box-footer">
-                                    More info <i class="fa fa-arrow-circle-right"></i>
-                                </a>
-                            </div>
-                        </div> -->
+                        </div>
+
                         <div class="col-lg-3 col-xs-6">
                             <!-- small box -->
                             <div class="small-box bg-red">
                                 <div class="inner">
                                     <h3>
                                         <?php
-                                        foreach($omzet AS $om):
-                                            echo $om->TOmzet;
-                                        endforeach;
+                                        $TL = $TLServis+$TLpart;
+                                            if(!empty($TL)){
+                                                echo $TL;
+                                            }else{
+                                                echo "0";
+                                            }
                                         ?>
                                     </h3>
                                     <p>
-                                        Omzet
+                                        Total Laba
                                     </p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-person-add"></i>
+                                    <i class="fa fa-money"></i>
                                 </div>
                                 <a href="#" class="small-box-footer">
-                                    <!-- More info <i class="fa fa-arrow-circle-right"></i> -->
+                                    TOTAL LABA
                                 </a>
                             </div>
                         </div><!-- ./col -->
@@ -210,8 +204,73 @@
                                 <div class="inner">
                                     <h3>
                                         <?php
-                                        foreach($unit AS $Un):
-                                            echo $Un->Unit;
+                                        $TModalPart="";
+                                       foreach($modal_part AS $mp):
+                                        $TModalPart= $mp->TModalPart;
+                                            if(!empty($mp->tgl_lunas)){
+                                                echo $mp->TModalPart;
+                                            }else{
+                                                echo "0";
+                                            }
+                                        endforeach;
+                                        ?>
+                                    </h3>
+                                    <p>
+                                        Modal Sparepart
+                                    </p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-money"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">
+                                    MODAL SPAREPART
+                                </a>
+                            </div>
+                        </div><!-- ./col -->
+
+                    </div><!-- /.row -->
+
+                    <!-- Small boxes (Stat box) -->
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-6">
+                            <!-- small box -->
+                            <div class="small-box bg-aqua">
+                                <div class="inner">
+                                    <h3>
+                                        <?php
+                                        $TOmzet = $TL+$TModalPart;
+                                            if(!empty($TOmzet)){
+                                                echo $TOmzet;
+                                            }else{
+                                                echo "0";
+                                            }
+                                        ?>
+                                    </h3>
+                                    <p>
+                                        Omzet
+                                    </p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-money"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">
+                                    OMZET
+                                </a>
+                            </div>
+                        </div><!-- ./col -->
+
+                        <div class="col-lg-3 col-xs-6">
+                            <!-- small box -->
+                            <div class="small-box bg-green">
+                                <div class="inner">
+                                    <h3>
+                                        <?php
+                                       foreach($unit AS $Un):
+                                            if(!empty($Un->tgl_lunas)){
+                                                echo $Un->Unit;
+                                            }else{
+                                                echo "0";
+                                            }
                                         endforeach;
                                         ?>
                                     </h3>
@@ -220,10 +279,10 @@
                                     </p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-person-add"></i>
+                                    <i class="fa fa-motorcycle"></i>
                                 </div>
                                 <a href="#" class="small-box-footer">
-                                    <!-- More info <i class="fa fa-arrow-circle-right"></i> -->
+                                    UNIT
                                 </a>
                             </div>
                         </div><!-- ./col -->
