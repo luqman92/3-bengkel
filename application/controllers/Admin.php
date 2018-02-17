@@ -41,11 +41,61 @@ class Admin extends CI_Controller {
 		$customer = $this->Model_admin->manualQuery("SELECT count(customer_id) AS jml FROM customer")->result();
 		$karyawan = $this->Model_admin->manualQuery("SELECT count(karyawan_id) AS jml FROM karyawan")->result();
 		$user = $this->Model_admin->manualQuery("SELECT count(iduser) AS jml FROM user")->result();
+
+		$laba_servis = $this->Model_admin->manualQuery("SELECT
+															a.tgl_lunas,
+															SUM( b.total ) AS tlaba_servis 
+														FROM
+															transaksi AS a
+															LEFT JOIN detil_transaksi AS b ON a.id = b.id 
+														WHERE
+															a.tgl_lunas = '2018-01-03'
+														AND
+														b.jenis='SERVIS'")->result();
+		$laba_sparepart = $this->Model_admin->manualQuery("SELECT
+																a.tgl_lunas,
+																SUM( b.total ) AS tlaba_part 
+															FROM
+																transaksi AS a
+																LEFT JOIN detil_transaksi AS b ON a.id = b.id 
+															WHERE
+																a.tgl_lunas = '2018-01-03'
+															AND
+															b.jenis='PART'")->result();
+		$modal_part = $this->Model_admin->manualQuery("SELECT
+															a.tgl_lunas,
+															b.jenis,
+															SUM( b.harga_beli ) AS TModalPart 
+														FROM
+															transaksi AS a
+															LEFT JOIN detil_transaksi AS b ON a.id = b.id 
+														WHERE
+															a.tgl_lunas = '2018-01-03' 
+															AND b.jenis = 'PART'")->result();
+		$omzet = $this->Model_admin->manualQuery("SELECT
+													a.tgl_lunas,
+													SUM( b.total ) AS TOmzet 
+												FROM
+													transaksi AS a
+													LEFT JOIN detil_transaksi AS b ON a.id = b.id 
+												WHERE
+													a.tgl_lunas = '2018-01-03'")->result();
+		$unit = $this->Model_admin->manualQuery("SELECT
+													count( a.nopol ) AS Unit 
+												FROM
+													`transaksi` AS a 
+												WHERE
+													tgl_lunas = '2018-01-03'")->result();
 		$data = array(
 			'trxbengkels' => $trxbengkel,
 			'customers' => $customer,
 			'karyawans' => $karyawan,
 			'users' => $user,
+			'laba_servis' => $laba_servis,
+			'laba_sparepart' => $laba_sparepart,
+			'modal_part' => $modal_part,
+			'omzet' => $omzet,
+			'unit' => $unit,
 			);
 		 $this->template_admin->load('template_admin','Moduls/home',$data);
 	}
