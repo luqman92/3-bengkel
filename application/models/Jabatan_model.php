@@ -1,25 +1,24 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Cabang_model extends CI_Model {
+class Jabatan_model extends CI_Model {
 
-	var $table = 'cabang';
-	var $column_order = array('cabang_id','nama','alamat','kota',null); //set column field database for datatable orderable
-	var $column_search = array('cabang_id','nama','alamat'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('cabang_id' => 'desc'); // default order 
+	var $table = 'jabatan';
+	var $column_order = array('nama','tlp','jabatan',null); //set column field database for datatable orderable
+	var $column_search = array('nama','tlp','jabatan'); //set column field database for datatable searchable just firstname , lastname , address are searchable
+	var $order = array('jabatan_id' => 'asc'); // default order 
 
-	/*public function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->load->database();
-	}*/
+	}
 
 	private function _get_datatables_query()
 	{
-		
+		$this->db->select('*');
 		$this->db->from($this->table);
-
-		$i = 0;
+	    $i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 
 		{
@@ -71,14 +70,14 @@ class Cabang_model extends CI_Model {
 
 	public function count_all()
 	{
-		$this->db->from($this->table);
-		return $this->db->count_all_results();
+			$this->db->from($this->table);
+			return $this->db->count_all_results();
 	}
 
 	public function get_by_id($id)
 	{
 		$this->db->from($this->table);
-		$this->db->where('cabang_id',$id);
+		$this->db->where('jabatan_id',$id);
 		$query = $this->db->get();
 
 		return $query->row();
@@ -98,23 +97,24 @@ class Cabang_model extends CI_Model {
 
 	public function delete_by_id($id)
 	{
-		$this->db->where('cabang_id', $id);
+		$this->db->where('jabatan_id', $id);
 		$this->db->delete($this->table);
 	}
 
-	// KODE CABANG
-    function getKodeCabang(){
-        $q = $this->db->query("select MAX(RIGHT(cabang_id,6)) as kd_max from cabang");
+	// KODE BARANG
+    function getKodeBrg(){
+        $q = $this->db->query("select MAX(RIGHT(KodeBarang,6)) as kd_max from masterbarang WHERE KodeBarang != 'JST'
+	AND KodeBarang != 'JSV'");
         $kd = "";
         if($q->num_rows()>0){
             foreach($q->result() as $k){
                 $tmp = ((int)$k->kd_max)+1;
-                $kd = sprintf("%06s", $tmp);
+                $kd = sprintf("%07s", $tmp);
             }
         }else{
-            $kd = "000001";
+            $kd = "00000001";
         }
-        return "CBG-".$kd;
+        return "BRG".$kd;
     }
 
 

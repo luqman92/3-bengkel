@@ -112,6 +112,7 @@ function edit_karyawan(id)
         success: function(data)
         {
  
+            $('[name="karyawan_id"]').val(data.karyawan_id);
             $('[name="noktp"]').val(data.noktp);
             $('[name="nama"]').val(data.nama);
             $('[name="alamat"]').val(data.alamat);

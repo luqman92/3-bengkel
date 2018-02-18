@@ -1,18 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Cabang_model extends CI_Model {
+class User_model extends CI_Model {
 
-	var $table = 'cabang';
-	var $column_order = array('cabang_id','nama','alamat','kota',null); //set column field database for datatable orderable
-	var $column_search = array('cabang_id','nama','alamat'); //set column field database for datatable searchable just firstname , lastname , address are searchable
-	var $order = array('cabang_id' => 'desc'); // default order 
-
-	/*public function __construct()
-	{
-		parent::__construct();
-		$this->load->database();
-	}*/
+	var $table = 'user';
+	var $column_order = array('username','nama_lengkap','email','notelp',null); //set column field database for datatable orderable
+	var $column_search = array('username','nama_lengkap','email'); //set column field database for datatable searchable just firstname , lastname , address are searchable
+	var $order = array('iduser' => 'desc'); // default order 
 
 	private function _get_datatables_query()
 	{
@@ -78,7 +72,7 @@ class Cabang_model extends CI_Model {
 	public function get_by_id($id)
 	{
 		$this->db->from($this->table);
-		$this->db->where('cabang_id',$id);
+		$this->db->where('iduser',$id);
 		$query = $this->db->get();
 
 		return $query->row();
@@ -98,7 +92,7 @@ class Cabang_model extends CI_Model {
 
 	public function delete_by_id($id)
 	{
-		$this->db->where('cabang_id', $id);
+		$this->db->where('iduser', $id);
 		$this->db->delete($this->table);
 	}
 

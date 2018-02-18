@@ -26,6 +26,9 @@ class Admin extends CI_Controller {
 		$this->load->model('Supplier_model','spp');
 		$this->load->model('Hutang_model','htg');
 		$this->load->model('Karyawan_model','kar');
+		$this->load->model('Jabatan_model','jbt');
+		$this->load->model('User_model','usr');
+		$this->load->model('Bopersional_model','bo');
 		
         //$this->load->library('My_PHPMailer');
 
@@ -397,74 +400,96 @@ class Admin extends CI_Controller {
 
 		public function cabang()
 	{
-		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
+		$kota = $this->Model_admin->manualQuery('SELECT * FROM kota')->result();
 		$data = array(
-			'cabangs' =>$this->Model_admin->manualQuery('SELECT * FROM cabang')->result(),
 			'kdcabang' =>$this->cbg->getKodeCabang(),
+			'kota'=>$kota
 			);
 		//$data['cabangs'] = $this->Model_admin->manualQuery('SELECT * FROM cabang')->result();
 		$this->template_admin->load('template_admin','Moduls/cabang/index',$data);
 	}
 
-	function act_addcabang(){
-    	$cabang_id = $this->input->post('cabang_id');
-    	$nama = $this->input->post('nama');
-    	$alamat = $this->input->post('alamat');
-    	$kota = $this->input->post('kota');
-    	$kodepos = $this->input->post('kodepos');
-    	$fax = $this->input->post('fax');
-    	$tlp = $this->input->post('tlp');
-    	$email = $this->input->post('email');
-    	
+    /*AJAX Cabang*/
+	public function ajax_list_cabang()
+    {
+    	$list = $this->cbg->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $cbg) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $cbg->cabang_id;
+            $row[] = $cbg->nama;
+            $row[] = $cbg->alamat;
+            $row[] = $cbg->kota;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_cabang('."'".$cbg->cabang_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_cabang('."'".$cbg->cabang_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->cbg->count_all(),
+                        "recordsFiltered" => $this->cbg->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_cabang($id)
+    {
+        $data = $this->cbg->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_cabang()
+    {
     	$data = array(
-			'cabang_id' => $cabang_id,
-			'alamat' => $alamat,
-			'kota' => $kota,
-			'kodepos' => $kodepos,
-			'fax' => $fax,
-			'tlp' => $tlp,
-			'email' => $email,
-			);
-		$this->Model_admin->create_data($data,'cabang');
-		redirect('admin/cabang');
+                'cabang_id' => $this->input->post('cabang_id'),
+                'nama' => $this->input->post('nama'),
+                'alamat' => $this->input->post('alamat'),
+                'kota' => $this->input->post('kota'),
+                'kodepos' => $this->input->post('kodepos'),
+                'fax' => $this->input->post('fax'),
+                'tlp' => $this->input->post('tlp'),
+                'email' => $this->input->post('email')
+            );
+        
+        $insert = $this->cbg->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
     }
-
-    function editcabang($id){
-    	$where = array('merk_id'=>$id);
-    	$data['merks'] = $this->Model_admin->edit_data($where,'merkmotor')->result();
-
-    	$this->template_admin->load('template_admin','Moduls/merkmotor/edit',$data);
+ 
+    public function ajax_update_cabang()
+    {
+        $data = array(
+                'nama' => $this->input->post('nama'),
+                'alamat' => $this->input->post('alamat'),
+                'kota' => $this->input->post('kota'),
+                'kodepos' => $this->input->post('kodepos'),
+                'fax' => $this->input->post('fax'),
+                'tlp' => $this->input->post('tlp'),
+                'email' => $this->input->post('email')
+            );
+        $this->cbg->update(array('cabang_id' => $this->input->post('cabang_id')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
     }
-    function act_editcabang(){
-    	/*echo "<pre>";
-    		print_r($_POST);
-    	echo "</pre>";*/
-
-    	$date = date('Y-m-d H:i:s');
-
-		$merk_id = $this->input->post('merk_id');
-		$merk_motor = $this->input->post('merk_motor');
-    	
-    	$data = array(
-    		'merk_id' => $merk_id,
-			'merk_motor' => $merk_motor,
-			'update_at' => $date,
-			);
-
-		$where = array(
-			'merk_id' => $merk_id
-		);
-
-		$this->Model_admin->update_data($where,$data,'merkmotor');
-		redirect('admin/cabang');
-	}
-
-    function delcabang($id){
-    	$where = array('merk_id'=>$id);
-    	
-    	$this->Model_admin->del_data($where,'merkmotor');
-		redirect('admin/cabang');
+ 
+    public function ajax_delete_cabang($id)
+    {
+        $this->cbg->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
     }
+	/*AJAX Cabang*/
 
 	public function karyawan()
 	{
@@ -518,13 +543,6 @@ class Admin extends CI_Controller {
  
     public function ajax_add_karyawan()
     {
-    	/*$('[name="noktp"]').val(data.noktp);
-            $('[name="nama"]').val(data.nama);
-            $('[name="alamat"]').val(data.alamat);
-            $('[name="tlp"]').val(data.tlp);
-            $('[name="hp"]').val(data.hp);
-            $('[name="email"]').val(data.email);
-            $('[name="jabatan"]').val(data.jabatan);*/
     	$data = array(
                 'noktp' => $this->input->post('noktp'),
                 'nama' => $this->input->post('nama'),
@@ -570,6 +588,75 @@ class Admin extends CI_Controller {
 		$data['jabatans'] = $this->Model_admin->manualQuery('SELECT * FROM jabatan')->result();
 		$this->template_admin->load('template_admin','Moduls/jabatan/index',$data);
 	}
+
+	/*AJAX Jabatan*/
+	public function ajax_list_jabatan()
+    {
+    	$list = $this->jbt->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $jbt) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $jbt->kode;
+            $row[] = $jbt->diskripsi;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_jabatan('."'".$jbt->jabatan_id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_jabatan('."'".$jbt->jabatan_id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->jbt->count_all(),
+                        "recordsFiltered" => $this->jbt->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_jabatan($id)
+    {
+        $data = $this->jbt->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_jabatan()
+    {
+    	$data = array(
+                'kode' => $this->input->post('kode'),
+                'diskripsi' => $this->input->post('diskripsi')
+            );
+        
+        $insert = $this->jbt->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_jabatan()
+    {
+        $data = array(
+                'kode' => $this->input->post('kode'),
+                'diskripsi' => $this->input->post('diskripsi')
+            );
+        $this->jbt->update(array('jabatan_id' => $this->input->post('jabatan_id')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_jabatan($id)
+    {
+        $this->jbt->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX Jabatan*/
 
 	public function jenispengeluaran()
 	{
@@ -795,62 +882,89 @@ class Admin extends CI_Controller {
 		public function user()
 	{
 		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		$data['users'] = $this->Model_admin->manualQuery('SELECT * FROM user')->result();
+		//$data['users'] = $this->Model_admin->manualQuery('SELECT * FROM user')->result();
+		$user_level = $this->Model_admin->manualQuery('SELECT * FROM user_level')->result();
+		$data = array(
+			'user_level'=> $user_level,
+			);
 		$this->template_admin->load('template_admin','Moduls/user/index',$data);
 	}
 
-	public function adduser()
-	{
-		$this->template_admin->load('template_admin','Moduls/user/add');
-	}
-    function act_adduser(){
-    	$merk_motor = $this->input->post('merk_motor');
-    	$date = date('Y-m-d H:i:s');
-
+		/*AJAX User*/
+	public function ajax_list_user()
+    {
+    	$list = $this->usr->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $usr) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $usr->username;
+            $row[] = $usr->nama_lengkap;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_user('."'".$usr->iduser."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_user('."'".$usr->iduser."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->usr->count_all(),
+                        "recordsFiltered" => $this->usr->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_user($id)
+    {
+        $data = $this->usr->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_user()
+    {
     	$data = array(
-			'merk_motor' => $merk_motor,
-			'created_at' => $date,
-			);
-		$this->Model_admin->create_data($data,'user');
-		redirect('admin/user');
+                'username' => $this->input->post('username'),
+                'pass' => $this->input->post('pass'),
+                'nama_lengkap' => $this->input->post('nama_lengkap'),
+                'email' => $this->input->post('email'),
+                'notelp' => $this->input->post('notelp'),
+                'level' => $this->input->post('level'),
+            );
+        
+        $insert = $this->usr->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
     }
-
-    function edituser($id){
-    	$where = array('iduser'=>$id);
-    	$data['merks'] = $this->Model_admin->edit_data($where,'user')->result();
-
-    	$this->template_admin->load('template_admin','Moduls/user/edit',$data);
+ 
+    public function ajax_update_user()
+    {
+        $data = array(
+                'pass' => $this->input->post('pass'),
+                'nama_lengkap' => $this->input->post('nama_lengkap'),
+                'email' => $this->input->post('email'),
+                'notelp' => $this->input->post('notelp'),
+                'level' => $this->input->post('level'),
+            );
+        $this->usr->update(array('iduser' => $this->input->post('iduser')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
     }
-    function act_edituser(){
-    	/*echo "<pre>";
-    		print_r($_POST);
-    	echo "</pre>";*/
-
-    	$date = date('Y-m-d H:i:s');
-
-		$iduser = $this->input->post('iduser');
-		$merk_motor = $this->input->post('merk_motor');
-    	
-    	$data = array(
-    		'iduser' => $iduser,
-			'merk_motor' => $merk_motor,
-			'update_at' => $date,
-			);
-
-		$where = array(
-			'iduser' => $iduser
-		);
-
-		$this->Model_admin->update_data($where,$data,'user');
-		redirect('admin/user');
-	}
-
-    function deluser($id){
-    	$where = array('iduser'=>$id);
-    	
-    	$this->Model_admin->del_data($where,'user');
-		redirect('admin/user');
+ 
+    public function ajax_delete_user($id)
+    {
+        $this->usr->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
     }
+	/*AJAX User*/
 
 /*
 ------------------------------------------------END MASTER DATA-----------------------------------------------------
@@ -1537,10 +1651,92 @@ VALUES ($max+1 , 'jim', 'sock')*/
 
 	public function biayaoperasional()
 	{
-		//$data['kat'] = $this->Model_admin->manualQuery('SELECT a.id_category,b.title FROM category AS a LEFT JOIN category_description AS b ON b.id_category = a.id_category')->result();
-		$data['pengeluarans'] = $this->Model_admin->manualQuery('SELECT * FROM pengeluaran ORDER BY tgl DESC')->result();
-		$this->template_admin->load('template_admin','Moduls/biayaoperasional/index',$data);
+		$this->template_admin->load('template_admin','Moduls/biayaoperasional/index');
 	}
+
+			/*AJAX BO*/
+	public function ajax_list_bo()
+    {
+    	$list = $this->bo->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $bo) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $bo->tgl;
+            $row[] = $bo->kode;
+            $row[] = $bo->diskripsi;
+            $row[] = $bo->keterangan;
+            $row[] = $bo->total;
+            
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_bo('."'".$bo->id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_bo('."'".$bo->id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->bo->count_all(),
+                        "recordsFiltered" => $this->bo->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        header('Content-Type: application/json');
+        echo json_encode($output);
+    }
+ 
+    public function ajax_edit_bo($id)
+    {
+        $data = $this->bo->get_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add_bo()
+    {
+    	/*$('[name="id"]').val(data.id);
+            $('[name="tgl"]').val(data.tgl);
+            $('[name="kode"]').val(data.kode);
+            $('[name="keterangan"]').val(data.keterangan);
+            $('[name="diskripsi"]').val(data.diskripsi);
+            $('[name="total"]').val(data.total);*/
+    	$data = array(
+                'tgl' => $this->input->post('tgl'),
+                'kode' => $this->input->post('kode'),
+                'keterangan' => $this->input->post('keterangan'),
+                'diskripsi' => $this->input->post('diskripsi'),
+                'total' => $this->input->post('total'),
+            );
+        
+        $insert = $this->bo->save($data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_update_bo()
+    {
+        $data = array(
+                'tgl' => $this->input->post('tgl'),
+                'kode' => $this->input->post('kode'),
+                'keterangan' => $this->input->post('keterangan'),
+                'diskripsi' => $this->input->post('diskripsi'),
+                'total' => $this->input->post('total'),
+            );
+        $this->bo->update(array('id' => $this->input->post('id')), $data);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+ 
+    public function ajax_delete_bo($id)
+    {
+        $this->bo->delete_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode(array("status" => TRUE));
+    }
+	/*AJAX BO*/
 
 	public function hutang()
 	{
