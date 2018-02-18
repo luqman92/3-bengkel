@@ -1169,7 +1169,7 @@ class Admin extends CI_Controller {
 													LEFT JOIN customer AS b ON a.customer_id = b.customer_id
 													LEFT JOIN detil_transaksi AS c ON a.id=c.id
 												WHERE a.id="'.$trx_id.'"')->result();
-			$mekanik = $this->Model_admin->manualQuery('SELECT * FROM karyawan WHERE id_jabatan="MK"')->result();
+			$mekanik = $this->Model_admin->manualQuery('SELECT * FROM karyawan')->result();
 			$dtmb = $this->Model_admin->manualQuery('SELECT
 												a.KodeBarang,
 												a.KodeCabang,
