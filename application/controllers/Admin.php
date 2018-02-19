@@ -271,13 +271,8 @@ class Admin extends CI_Controller {
  
     public function ajax_delete_suplier($id)
     {
-    	$where = array(
-    		'supplier_id'=>$id,);
-    	$data = array(
-    		'status'=>'nullified',
-    		);
-    	$this->Model_admin->update_data($where,$data,'customer');
-        //$this->spp->delete_by_id($id);
+    	//$this->Model_admin->update_data($where,$data,'supplier');
+        $this->spp->delete_by_id($id);
         header('Content-Type: application/json');
         echo json_encode(array("status" => TRUE));
     }
@@ -1250,7 +1245,7 @@ class Admin extends CI_Controller {
     		$query = $this->Model_admin->manualQuery('SELECT b.no_pmb,a.KodeBarang,a.KodeCabang,a.NamaBarang,a.Satuan,b.harga AS HPP,a.HargaJual,a.Status FROM masterbarang AS a LEFT JOIN sparepart_pmb AS b ON a.KodeBarang = b.kode WHERE KodeBarang="'.$KodeBarang.'"');
     		$row = $query->row_array();
     		$NamaBarang = $row['NamaBarang'];
-    		$HJ = $row['HargaJual'];
+    		$HJ = $harga;
     		$HPP = $row['HPP'];
     		$no_pmb = $row['no_pmb'];
     		$total = $HJ * $Keluar;
