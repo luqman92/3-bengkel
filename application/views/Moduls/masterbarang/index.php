@@ -162,7 +162,7 @@ function save()
             {
                 $('#modal_form').modal('hide');
                 reload_table();
-                document.location.reload();
+                //document.location.reload();
             }
  
             $('#btnSave').text('save'); //change button text
@@ -218,13 +218,13 @@ function delete_masterbrg(id)
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="id"/> 
                     <div class="form-body">
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label class="control-label col-md-3">Kode Barang</label>
                             <div class="col-md-9">
                                 <input name="KodeBarang" placeholder="" class="form-control" type="text" value="<?=$KdBrg?>" readonly>
                                 <span class="help-block"></span>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label class="control-label col-md-3">Nama Barang</label>
                             <div class="col-md-9">

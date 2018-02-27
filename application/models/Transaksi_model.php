@@ -117,18 +117,19 @@ class Transaksi_model extends CI_Model {
 	}
 
 	// KODE BARANG
-    function getKodeBrg(){
-        $q = $this->db->query("select MAX(RIGHT(KodeBaidrang,6)) as kd_max from masterbarang");
+    function getKodeTRX(){
+        $q = $this->db->query("select MAX(RIGHT(id,9)) as kd_max from transaksi");
         $kd = "";
         if($q->num_rows()>0){
             foreach($q->result() as $k){
                 $tmp = ((int)$k->kd_max)+1;
-                $kd = sprintf("%07s", $tmp);
+                $kd = sprintf("%09s", $tmp);
             }
         }else{
-            $kd = "00000001";
+            $kd = "000000001";
         }
-        return "BRG".$kd;
+        $curr_date = date('dmy');
+        return "TR".$kd."-".$curr_date;
     }
 
 

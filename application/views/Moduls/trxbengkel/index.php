@@ -449,6 +449,15 @@ function delete_trxbengkel(id)
                             </select>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Keterangan Jasa</label>
+                            <div class="col-md-9">
+                                <input name="Keterangan" placeholder="" class="form-control" type="text">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+
                          <div class="form-group">
                             <label class="control-label col-md-3">Nama Barang</label>
                             <div class="col-md-9">
@@ -467,15 +476,7 @@ function delete_trxbengkel(id)
                         </div>
                         
                          <div class="form-group">
-                            <label class="control-label col-md-3">Keterangan Jasa</label>
-                            <div class="col-md-9">
-                                <input name="Keterangan" placeholder="" class="form-control" type="text">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-
-                         <div class="form-group">
-                            <label class="control-label col-md-3">Harga Jasa</label>
+                            <label class="control-label col-md-3">Harga</label>
                             <div class="col-md-9">
                                 <input name="harga" placeholder="" class="form-control" type="number">
                                 <span class="help-block"></span>

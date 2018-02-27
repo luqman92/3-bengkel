@@ -13,7 +13,7 @@ class Admin extends CI_Controller {
             redirect('login');
         };*/
 		$this->load->model('Model_admin');
-		$this->load->helper('format_angka');
+		$this->load->helper('format');
 		$this->load->model('Model_trxbengkel','trx');
 		$this->load->model('Cabang_model','cbg');
 		$this->load->model('Customer_model','cstm');
@@ -735,8 +735,10 @@ class Admin extends CI_Controller {
     public function ajax_add_mb()
     {
     	$KodeCabang = $this->session->userdata('cabang');
+        $KodeBrg = $this->mb->getKodeBrg();
         $data = array(
-                'KodeBarang' => $this->input->post('KodeBarang'),
+                //'KodeBarang' => $this->input->post('KodeBarang'),$this->mb->getKodeBrg()
+                'KodeBarang' => $KodeBrg,
                 'NamaBarang' => $this->input->post('NamaBarang'),
                 'Satuan' => $this->input->post('Satuan'),
                 'HPP' => $this->input->post('HPP'),
@@ -744,7 +746,8 @@ class Admin extends CI_Controller {
                 'KodeCabang' => $KodeCabang,
             );
         $datast = array(
-        	'KodeBarang' => $this->input->post('KodeBarang'),
+            //'KodeBarang' => $this->input->post('KodeBarang'),
+        	'KodeBarang' => $KodeBrg,
         	'StokAkhir' => '0',
 		);
         $insert = $this->mb->save($data);
@@ -974,16 +977,31 @@ class Admin extends CI_Controller {
 	public function trx_add($id)
 	{
 		$cust_id = $id;
-		$trx = "TRX".date('ymd').rand(100000,999999);
+        $trx = $this->trxl->getKodeTRX();
+		//$trx = "TRX".date('ymd').rand(100000,999999);
 		$datenow = date('Y-m-d H:i:s');
 
     	$sess_data['trx_id'] = $trx;
 		$this->session->set_userdata($sess_data);
-
+        $query = $this->Model_admin->manualQuery('SELECT a.no_polisi,a.nama,b.tipe FROM customer AS a LEFT JOIN motor AS b ON b.mtr_id=a.mtr_id');
+        $row = $query->row_array();
+        $nopol = $row['no_polisi'];
+        $tipe = $row['tipe'];
+        $nama_cust = $row['nama'];
+        $waktu1 = date('H:i:s');
+        $waktu2 = date('H:i:s');
 		$data = array(
 			'customer_id' => $cust_id,
 			'id' => $trx,
-			'tgl' => $datenow,
+            'nopol' => $nopol,
+            'waktu1' => $waktu1,
+            'waktu2' => $waktu2,
+            'nama_cust' => $nama_cust,
+            'tipe_motor' => $tipe,
+            //'merek_motor' => $merek_motor,
+            'tgl' => $datenow,
+            'tgl_tempo' => $datenow,
+			'tgl_lunas' => $datenow,
 			);
 
 		$cbg = $this->session->userdata('cabang');
@@ -1339,7 +1357,7 @@ class Admin extends CI_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $pmb->tgl;
+            $row[] = tgl_eng_to_ind($pmb->tgl);
             $row[] = $pmb->no_pmb;
             $row[] = $pmb->supplier;
             
@@ -1373,11 +1391,12 @@ class Admin extends CI_Controller {
  
     public function ajax_add_pmb()
     {
-    	$cbg = $this->session->userdata('cabang');
+        $NoPMB = $this->pmb->getKodePMB();
+        $cbg = $this->session->userdata('cabang');
     	$currdate = date('Y-m-d');
         
         $data = array(
-                'no_pmb' => $this->input->post('no_pmb'),
+                'no_pmb' => $NoPMB,
                 'supplier' => $this->input->post('nama'),
                 'cabang_id' => $cbg,
                 'tgl' => $currdate,
@@ -1659,11 +1678,11 @@ VALUES ($max+1 , 'jim', 'sock')*/
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $bo->tgl;
+            $row[] = tgl_eng_to_ind($bo->tgl);
             $row[] = $bo->kode;
             $row[] = $bo->diskripsi;
             $row[] = $bo->keterangan;
-            $row[] = $bo->total;
+            $row[] = format_angka($bo->total);
             
             //add html for action
             $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_bo('."'".$bo->id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
@@ -1819,6 +1838,113 @@ VALUES ($max+1 , 'jim', 'sock')*/
 		$data['returs'] = $this->Model_admin->manualQuery('SELECT a.key_id,a.kode,a.diskripsi,a.qty,a.total,b.keterangan,b.status FROM retur AS a LEFT JOIN notaretur AS b ON b.id = a.id ORDER BY b.tgl DESC')->result();
 		$this->template_admin->load('template_admin','Moduls/retursparepart/index',$data);
 	}
+
+    public function lapomzet()
+    {
+        $btn_cetakPDF = $this->input->post('btn_cetakPDF');
+        $btn_tampil = $this->input->post('btn_tampil');
+        $tgl_awal = $this->input->post('tgl_awal');
+        $tgl_akhir = $this->input->post('tgl_akhir');
+
+        $sess_data['tgl_awal'] = $tgl_awal;
+        $sess_data['tgl_akhir'] = $tgl_akhir;
+        $this->session->set_userdata($sess_data);
+
+        if(isset($btn_cetakPDF)){
+            $selLaba = $this->Model_admin->manualQuery("SELECT
+                                                        a.tgl_lunas,
+                                                        SUM( IF ( b.jenis = 'SERVIS',b.total,0 ) ) AS TLabaServis,
+                                                        SUM( IF ( b.jenis = 'PART',b.total,0 ) ) AS TLabaPart, 
+                                                        SUM(b.harga_beli) AS TModalPart,
+                                                        SUM(b.total) AS Omzet
+                                                    FROM
+                                                        transaksi AS a
+                                                        LEFT JOIN detil_transaksi AS b ON b.id = a.id 
+                                                    WHERE
+                                                        a.tgl_lunas BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' 
+                                                    GROUP BY a.tgl_lunas; ")->result();
+            $selLabar = $this->Model_admin->manualQuery("SELECT
+                                                        a.tgl_lunas,
+                                                        SUM( IF ( b.jenis = 'SERVIS',b.total,0 ) ) AS TLabaServis,
+                                                        SUM( IF ( b.jenis = 'PART',b.total,0 ) ) AS TLabaPart, 
+                                                        SUM(b.harga_beli) AS TModalPart,
+                                                        SUM(b.total) AS Omzet
+                                                    FROM
+                                                        transaksi AS a
+                                                        LEFT JOIN detil_transaksi AS b ON b.id = a.id 
+                                                    WHERE
+                                                        a.tgl_lunas BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' 
+                                                    GROUP BY a.tgl_lunas; ");
+            $row = $selLabar->row();
+
+        $pdf = new FPDF('l','mm','Letter');//A4,Letter,Legal
+        // membuat halaman baru
+        $pdf->AddPage();
+        // setting jenis font yang akan digunakan
+        $pdf->SetFont('Arial','B',16);
+        // mencetak string 
+        $pdf->Cell(275,7,'Laporan Omzet Pro Matic 002',0,1,'C');
+        $pdf->SetFont('Arial','B',12);
+        $pdf->Cell(275,7,'PERIODE '.tgl_eng_to_ind($tgl_awal).' S/D '.tgl_eng_to_ind($tgl_akhir),0,1,'C');
+        // Memberikan space kebawah agar tidak terlalu rapat
+        $pdf->Cell(30,7,'',0,1);
+        $pdf->SetFont('Arial','B',14);
+        $pdf->Cell(20,6,'No',1,0);
+        $pdf->Cell(40,6,'TANGGAL',1,0);
+        $pdf->Cell(40,6,'LABA SERVIS',1,0);
+        $pdf->Cell(40,6,'LABA PART',1,0);
+        $pdf->Cell(40,6,'MODAL PART',1,0);
+        $pdf->Cell(40,6,'OMZET',1,1);
+        $pdf->SetFont('Arial','',12);
+        $no = 1;
+        $TLabaServis="";
+        $TLabaPart="";
+        $TModalPart="";
+        $Omzet="";
+        if(isset($row)){
+        foreach ($selLaba as $row){
+            $TLabaServis = $TLabaServis+$row->TLabaServis;
+            $TLabaPart = $TLabaPart+$row->TLabaPart;
+            $TModalPart = $TModalPart+$row->TModalPart;
+            $Omzet = $Omzet+$row->Omzet;
+            $pdf->Cell(20,6,$no,1,0);
+            $pdf->Cell(40,6,$row->tgl_lunas,1,0);
+            $pdf->Cell(40,6,format_angka($row->TLabaServis),1,0);
+            $pdf->Cell(40,6,format_angka($row->TLabaPart),1,0);
+            $pdf->Cell(40,6,format_angka($row->TModalPart),1,0); 
+            $pdf->Cell(40,6,format_angka($row->Omzet),1,1); 
+        $no++;
+        }
+
+        $pdf->SetFont('Arial','B',14);
+        $pdf->Cell(60,7,'TOTAL',1,0,'C');
+        $pdf->Cell(40,7,'Rp. '.format_angka($TLabaServis),1,0);
+        $pdf->Cell(40,7,'Rp. '.format_angka($TLabaPart),1,0);
+        $pdf->Cell(40,7,'Rp. '.format_angka($TModalPart),1,0);
+        $pdf->Cell(40,7,'Rp. '.format_angka($Omzet),1,0);
+        }
+        $pdf->Output();
+        }else{
+            $selLaba = $this->Model_admin->manualQuery("SELECT
+                                                        a.tgl_lunas,
+                                                        SUM( IF ( b.jenis = 'SERVIS',b.total,0 ) ) AS TLabaServis,
+                                                        SUM( IF ( b.jenis = 'PART',b.total,0 ) ) AS TLabaPart, 
+                                                        SUM(b.harga_beli) AS TModalPart,
+                                                        SUM(b.total) AS Omzet
+                                                    FROM
+                                                        transaksi AS a
+                                                        LEFT JOIN detil_transaksi AS b ON b.id = a.id 
+                                                    WHERE
+                                                        a.tgl_lunas BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' 
+                                                    GROUP BY a.tgl_lunas; ")->result();
+            $data = array(
+                'selLabas'=> $selLaba,
+                'btn_tampil'=> $btn_tampil,
+                );
+            $this->template_admin->load('template_admin','Moduls/lapomzet/index',$data);
+            }
+    }
+
 
 
 }

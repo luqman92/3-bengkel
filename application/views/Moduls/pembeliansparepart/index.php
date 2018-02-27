@@ -102,7 +102,7 @@ function add_pmb_sparepart()
     $('.form-group').removeClass('has-error'); // clear error class
     $('.help-block').empty(); // clear error string
     $('#modal_form').modal('show'); // show bootstrap modal
-    $('.modal-title').text('Add Person'); // Set Title to Bootstrap modal title
+    $('.modal-title').text('Add Supplier'); // Set Title to Bootstrap modal title
 }
  
 function edit_pmb_sparepart(id)
@@ -129,7 +129,7 @@ function edit_pmb_sparepart(id)
             $('[name="pot]').val(data.pot);
             $('[name="total"]').val(data.total);
             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-            $('.modal-title').text('Edit Person'); // Set title to Bootstrap modal title
+            $('.modal-title').text('Edit Supplier'); // Set title to Bootstrap modal title
  
         },
         error: function (jqXHR, textStatus, errorThrown)
@@ -169,13 +169,13 @@ function save()
             if(data.status) //if success close modal and reload ajax table
             {
                 $('#modal_form').modal('hide');
-                document.location.reload();
+                //document.location.reload();
                 reload_table();
     $('#modal_form').on('shown.bs.modal', function () {
       $('#myInput').focus()
     })
     $('#modal_form').on('hidden.bs.modal', function () {
-      document.location.reload();
+      //document.location.reload();
 
     })
 
@@ -234,13 +234,13 @@ function delete_pmb_sparepart(id)
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="no_pmb"/> 
                     <div class="form-body">
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label class="control-label col-md-3">No Transaksi</label>
                             <div class="col-md-9">
                                 <input name="no_pmb" placeholder="First Name" class="form-control" type="text" value="<?=$NoPMB?>" readonly>
                                 <span class="help-block"></span>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label class="control-label col-md-3">Supplier</label>
                             <div class="col-md-9">
