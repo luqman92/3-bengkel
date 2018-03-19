@@ -47,15 +47,15 @@ function terbilang($x)
   elseif ($x < 20)
     return Terbilang($x - 10) . " Belas" ;
   elseif ($x < 100)
-    return Terbilang($x / 10) . " Puluh" . Terbilang($x % 10)." Rupiah";
+    return Terbilang($x / 10) . " Puluh" . Terbilang($x % 10);
   elseif ($x < 200)
     return " seratus" . Terbilang($x - 100);
   elseif ($x < 1000)
-    return Terbilang($x / 100) . " Ratus" . Terbilang($x % 100)." Rupiah";
+    return Terbilang($x / 100) . " Ratus" . Terbilang($x % 100);
   elseif ($x < 2000)
     return " seribu" . Terbilang($x - 1000);
   elseif ($x < 1000000)
-    return Terbilang($x / 1000) . " Ribu" . Terbilang($x % 1000)." Rupiah";
+    return Terbilang($x / 1000) . " Ribu" . Terbilang($x % 1000);
   elseif ($x < 1000000000)
-    return Terbilang($x / 1000000) . " Juta" . Terbilang($x % 1000000)." Rupiah";
+    return Terbilang($x / 1000000) . " Juta" . Terbilang($x % 1000000);
 }

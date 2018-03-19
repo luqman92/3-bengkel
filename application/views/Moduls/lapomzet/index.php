@@ -1,3 +1,4 @@
+<!-- 0821-6186-9689 -->
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
@@ -51,7 +52,7 @@
                                             <button class="btn btn-success" type="submit" name="btn_tampil">Tampilkan!</button>
                                           </span>
                                           <span class="input-group-btn">
-                                            <button class="btn btn-success" type="submit" name="btn_cetakPDF">Cetak PDF</button>
+                                            <button class="btn btn-success" type="submit" name="btn_cetakPDF" target="_blank">Cetak PDF</button>
                                           </span>
                                     </div>
                                     <?php } ?>
@@ -77,6 +78,7 @@
                                                         <th>Laba Part</th>
                                                         <th>Modal Part</th>
                                                         <th>Omzet</th>
+                                                        <th>Unit</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -87,11 +89,13 @@
                                                 $TLabaPart ="";
                                                 $TModalPart ="";
                                                 $Omzet ="";
+                                                $Unit ="";
                                                 foreach($selLabas AS $row){
                                                     $TLabaServis = $TLabaServis+$row->TLabaServis;
                                                     $TLabaPart = $TLabaPart+$row->TLabaPart;
                                                     $TModalPart = $TModalPart+$row->TModalPart;
                                                     $Omzet = $Omzet+$row->Omzet;
+                                                    $Unit = $Unit+$row->Unit;
                                                 ?>
                                                     <tr>
                                                         <td><?=$no?></td>
@@ -100,6 +104,7 @@
                                                         <td><?=format_angka($row->TLabaPart)?></td>
                                                         <td><?=format_angka($row->TModalPart)?></td>
                                                         <td><?=format_angka($row->Omzet)?></td>
+                                                        <td><?=$row->Unit?></td>
                                                     </tr>
                                                 <?php
                                                 $no++;
@@ -111,27 +116,33 @@
                                                         <td style="font-size:20px; font-weight:bold;">Rp. <?=format_angka($TLabaPart)?></td>
                                                         <td style="font-size:20px; font-weight:bold;">Rp. <?=format_angka($TModalPart)?></td>
                                                         <td style="font-size:20px; font-weight:bold;">Rp. <?=format_angka($Omzet)?></td>
+                                                        <td style="font-size:20px; font-weight:bold;"><?=$Unit?></td>
                                                     </tr>
 
                                                     <tr>
                                                         <td style="font-weight:bold;">LABA SERVIS</td>
                                                         <td>:</td>
-                                                        <td colspan="4" style="font-weight:bold;">Rp. <?=format_angka($TLabaServis)?> <?="(".terbilang($TLabaServis).")"?></td>
+                                                        <td colspan="5" style="font-weight:bold;">Rp. <?=format_angka($TLabaServis)?> <?="(".terbilang($TLabaServis).")"?></td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-weight:bold;">LABA PART</td>
                                                         <td>:</td>
-                                                        <td colspan="4" style="font-weight:bold;">Rp. <?=format_angka($TLabaPart)?> <?="(".terbilang($TLabaPart).")"?></td>
+                                                        <td colspan="5" style="font-weight:bold;">Rp. <?=format_angka($TLabaPart)?> <?="(".terbilang($TLabaPart).")"?></td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-weight:bold;">MODAL PART</td>
                                                         <td>:</td>
-                                                        <td colspan="4" style="font-weight:bold;">Rp. <?=format_angka($TModalPart)?> <?="(".terbilang($TModalPart).")"?></td>
+                                                        <td colspan="5" style="font-weight:bold;">Rp. <?=format_angka($TModalPart)?> <?="(".terbilang($TModalPart).")"?></td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-weight:bold;">OMZET</td>
                                                         <td>:</td>
-                                                        <td colspan="4" style="font-weight:bold;">Rp. <?=format_angka($Omzet)?> <?="(".terbilang($Omzet).")"?></td>
+                                                        <td colspan="5" style="font-weight:bold;">Rp. <?=format_angka($Omzet)?> <?="(".terbilang($Omzet).")"?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="font-weight:bold;">TOTAL UNIT</td>
+                                                        <td>:</td>
+                                                        <td colspan="5" style="font-weight:bold;"><?=$Unit?> <?="(".terbilang($Unit).")"?></td>
                                                     </tr>
                                                 </tbody>
                                             </table>

@@ -29,6 +29,7 @@
                                                 <th>No Transaksi</th>
                                                 <th>Nama Customer</th>
                                                 <th>No Polisi</th>
+                                                <th>Tipe</th>
                                                 <th>Mekanik</th>
                                                 <th>Action</th>
                                             </tr>
@@ -42,6 +43,7 @@
                                                 <th>No Transaksi</th>
                                                 <th>Nama Customer</th>
                                                 <th>No Polisi</th>
+                                                <th>Tipe</th>
                                                 <th>Mekanik</th>
                                                 <th>Action</th> 
                                             </tr>

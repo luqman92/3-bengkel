@@ -30,7 +30,7 @@
                                                     </a>
                                                 </h4>
                                             </div>
-                                            <div id="collapseOne" class="panel-collapse collapse">
+                                            <div id="collapseOne" class="panel-collapse collapse in">
                                                 <div class="box-body">
                                                 
                                                 <?php
@@ -116,13 +116,13 @@
                                                     </a>
                                                 </h4>
                                             </div>
-                                            <div id="collapseTwo" class="panel-collapse collapse in">
+                                            <div id="collapseTwo" class="panel-collapse collapse">
                                                 <div class="box-body">
                                                 <button class="btn btn-success" onclick="add_barang()"><i class="glyphicon glyphicon-plus"></i> Pembelian Barang</button>
                                                 <button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
                                                 <br />
                                                 <br />
-                                                    <table id="tables" class="table table-bordered table-striped" cellspacing="0" width="100%">
+                                                    <table id="table" class="table table-bordered table-striped" cellspacing="0" width="100%">
                                                         <thead>
                                                             <tr>
                                                                 <th>No</th>
@@ -301,7 +301,6 @@ function reload_table()
 {
     //alert('TEST') ;
     table.ajax.reload(null,false); //reload datatable ajax 
-    document.location.reload();
 }
  
 function save()
@@ -360,7 +359,6 @@ function delete_barang(id)
                 //if success reload ajax table
                 $('#modal_form').modal('hide');
                 reload_table();
-                document.location.reload();
             },
             error: function (jqXHR, textStatus, errorThrown)
             {

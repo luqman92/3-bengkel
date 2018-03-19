@@ -118,7 +118,7 @@ function edit_masterbrg(id)
             $('[name="KodeBarang"]').val(data.KodeBarang);
             $('[name="NamaBarang"]').val(data.NamaBarang);
             $('[name="Satuan"]').val(data.Satuan);
-            //$('[name="HPP"]').val(data.HPP);
+            $('[name="HPP"]').val(data.HPP);
             $('[name="HargaJual"]').val(data.HargaJual);
             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
             $('.modal-title').text('Edit Master Barang'); // Set title to Bootstrap modal title
@@ -216,7 +216,7 @@ function delete_masterbrg(id)
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
-                    <input type="hidden" value="" name="id"/> 
+                    <input type="hidden" value="" name="KodeBarang"/> 
                     <div class="form-body">
                         <!-- <div class="form-group">
                             <label class="control-label col-md-3">Kode Barang</label>
@@ -243,13 +243,13 @@ function delete_masterbrg(id)
                                 <span class="help-block"></span>
                             </div>
                         </div>
-                       <!--  <div class="form-group">
+                        <div class="form-group">
                             <label class="control-label col-md-3">Harga Pokok</label>
                             <div class="col-md-9">
                                 <input name="HPP" placeholder="" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
-                        </div> -->
+                        </div>
                         <div class="form-group">
                             <label class="control-label col-md-3">Harga Jual</label>
                             <div class="col-md-9">

@@ -32,13 +32,7 @@
                                             </div>
                                             <div id="collapseOne" class="panel-collapse collapse in">
                                                 <div class="box-body">
-                                    <?php
-                                    $customer_id = "";
-                                    $Jenis = "";
-                                    foreach($dtrxs AS $dtrx){
-                                        $customer_id = $dtrx->customer_id;
-                                        $Jenis = $dtrx->jenis;
-                                    ?>
+                                    
                                 <form action="<?php echo site_url('admin/trxbengkelup')?>" method="post">
                                     <a class="btn btn-success" href="<?=site_url('admin/unsetcust')?>"><i class="glyphicon glyphicon-plus"></i> Pilih Customer</a>
                                          <br>
@@ -48,7 +42,7 @@
                                         <div class="row">
                                             <div class="col-xs-2">
                                                 <label>No Trans #</label>
-                                                <input class="form-control" type="text" name="id" value="<?=$KdTrx?>" readonly>
+                                                <input class="form-control" type="text" name="id" value="" readonly>
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Cara Bayar</label>
@@ -59,15 +53,15 @@
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Tgl Transaksi</label>
-                                                <input class="form-control" type="date" name="tgl" value="<?=$dtrx->tgl?>">
+                                                <input class="form-control" type="date" name="tgl" value="">
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Jatuh Tempo</label>
-                                                <input class="form-control" type="date" name="tgl_tempo" value="<?=$dtrx->tgl_tempo?>">
+                                                <input class="form-control" type="date" name="tgl_tempo" value="">
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>Tgl Lunas</label>
-                                                <input class="form-control" type="date" name="tgl_lunas" value="<?=$dtrx->tgl_lunas?>">
+                                                <input class="form-control" type="date" name="tgl_lunas" value="">
                                             </div>
                                         </div>
                                     </div>
@@ -75,11 +69,11 @@
                                         <div class="row">
                                             <div class="col-xs-2">
                                                 <label>No Pol #</label>
-                                                <input class="form-control" type="text" name="nopol" value="<?=$dtrx->no_polisi?>" readonly>
+                                                <input class="form-control" type="text" name="nopol" value="" readonly>
                                             </div>
                                             <div class="col-xs-2">
                                                 <label>KM Motor</label>
-                                                <input class="form-control" type="number" name="km" value="<?=$dtrx->km?>">
+                                                <input class="form-control" type="number" name="km" value="">
                                             </div>
                                         </div>
                                     </div>
@@ -88,11 +82,11 @@
                                         <div class="row">
                                             <div class="col-xs-5">
                                                 <label>Keluhan</label>
-                                                <textarea class="form-control" name="keluhan"><?=$dtrx->keluhan?></textarea>
+                                                <textarea class="form-control" name="keluhan"></textarea>
                                             </div>
                                             <div class="col-xs-5">
                                                 <label>Keterangan</label>
-                                                <textarea class="form-control" name="keterangan"><?=$dtrx->keterangan?></textarea>
+                                                <textarea class="form-control" name="keterangan"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -103,16 +97,7 @@
                                                 <label>Mekanik</label>
                                                 <select class="form-control" name="id_mekanik">
                                                     <option value=""></option>
-                                                    <?php
-                                                    foreach($mekaniks AS $mekanik){
-                                                        $selected="";
-                                                        if($mekanik->nama){
-                                                            $selected = "selected";
-                                                        }
-                                                        ?>
-                                                        <option value="<?=$mekanik->karyawan_id?>" <?=$selected?>><?=$mekanik->nama?></option>
-                                                        <?php
-                                                    }
+                                                    
                                                     ?>
                                                 </select>
                                             </div>
@@ -126,7 +111,6 @@
                                         </div>
                                     </div>                                    
                                     </form>
-                                    <?php } ?>
                                     
                                                 </div>
                                             </div>

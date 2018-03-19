@@ -28,6 +28,7 @@ class Stokbrg_model extends CI_Model {
 			$this->db->select('a.KodeBarang,b.NamaBarang,a.StokAkhir,b.HargaJual');
 			$this->db->from($this->table.' AS a');
 			$this->db->join('masterbarang AS b', 'b.KodeBarang=a.KodeBarang');
+			$this->db->order_by('a.StokAkhir','asc');
         $i = 0;
 	
 		foreach ($this->column_search as $item) // loop column 

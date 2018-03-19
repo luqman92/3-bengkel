@@ -44,7 +44,7 @@ class Admin extends CI_Controller {
 		*/
 		$currdate = date('Y-m-d');
 		$trxbengkel = $this->Model_admin->manualQuery("SELECT count(id) AS jml FROM transaksi WHERE tgl=now()")->result();
-		$customer = $this->Model_admin->manualQuery("SELECT count(customer_id) AS jml FROM customer")->result();
+		$customer = $this->Model_admin->manualQuery("SELECT count(customer_id) AS jml FROM customer WHERE status='normal'")->result();
 		$karyawan = $this->Model_admin->manualQuery("SELECT count(karyawan_id) AS jml FROM karyawan")->result();
 		$user = $this->Model_admin->manualQuery("SELECT count(iduser) AS jml FROM user")->result();
 
@@ -737,7 +737,6 @@ class Admin extends CI_Controller {
     	$KodeCabang = $this->session->userdata('cabang');
         $KodeBrg = $this->mb->getKodeBrg();
         $data = array(
-                //'KodeBarang' => $this->input->post('KodeBarang'),$this->mb->getKodeBrg()
                 'KodeBarang' => $KodeBrg,
                 'NamaBarang' => $this->input->post('NamaBarang'),
                 'Satuan' => $this->input->post('Satuan'),
@@ -746,8 +745,7 @@ class Admin extends CI_Controller {
                 'KodeCabang' => $KodeCabang,
             );
         $datast = array(
-            //'KodeBarang' => $this->input->post('KodeBarang'),
-        	'KodeBarang' => $KodeBrg,
+            'KodeBarang' => $KodeBrg,
         	'StokAkhir' => '0',
 		);
         $insert = $this->mb->save($data);
@@ -1040,11 +1038,12 @@ class Admin extends CI_Controller {
             $row[] = $trxl->id;
             $row[] = $trxl->cust;
             $row[] = $trxl->no_polisi;
+            $row[] = $trxl->tipe_motor;
             $row[] = $trxl->mekanik;
             
             //add html for action
             if($trxl->status=='final'){
-            $row[] = '<a class="btn btn-sm btn-primary" href="#" title="Lunas"><i class="glyphicon glyphicon-check"></i> LUNAS</a>';
+            $row[] = '<a class="btn btn-sm btn-success" href="'.site_url('admin/cetaktrx/'.$trxl->id).'" title="Transaksi"><i class="glyphicon glyphicon-print"></i> Cetak</a> <a class="btn btn-sm btn-primary" href="#" title="Lunas"><i class="glyphicon glyphicon-check"></i> LUNAS</a>';
             }else{
             $row[] = '<a class="btn btn-sm btn-primary" href="'.site_url('admin/trx_bkl/'.$trxl->id).'" title="Transaksi"><i class="glyphicon glyphicon-shopping-cart"></i> Transaksi</a> <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_trxl('."'".$trxl->id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  			}
@@ -1187,12 +1186,15 @@ class Admin extends CI_Controller {
 												a.KodeBarang,
 												a.KodeCabang,
 												a.NamaBarang,
-												a.HPP,
+                                                a.HPP,
+												a.Satuan,
 												a.HargaJual,
 												b.StokAkhir 
 											FROM
 												masterbarang AS a
-												LEFT JOIN stokbarang AS b ON a.KodeBarang = b.KodeBarang')->result();
+												LEFT JOIN stokbarang AS b ON a.KodeBarang = b.KodeBarang
+                                                WHERE b.StokAkhir >1
+                                                ')->result();
 			$data = array(
 				'KdTrx' => $trx_id,
 				'dtrxs' => $dtrx,
@@ -1260,7 +1262,7 @@ class Admin extends CI_Controller {
     	$currdate = date('Y-m-d');
 
     	if($JenisTrx=='PART'){
-    		$query = $this->Model_admin->manualQuery('SELECT b.no_pmb,a.KodeBarang,a.KodeCabang,a.NamaBarang,a.Satuan,b.harga AS HPP,a.HargaJual,a.Status FROM masterbarang AS a LEFT JOIN sparepart_pmb AS b ON a.KodeBarang = b.kode WHERE KodeBarang="'.$KodeBarang.'"');
+    		$query = $this->Model_admin->manualQuery('SELECT b.no_pmb,a.KodeBarang,a.KodeCabang,a.NamaBarang,a.Satuan,a.HPP,a.HargaJual,a.Status FROM masterbarang AS a LEFT JOIN sparepart_pmb AS b ON a.KodeBarang = b.kode WHERE KodeBarang="'.$KodeBarang.'"'); //,b.harga AS HPP
     		$row = $query->row_array();
     		$NamaBarang = $row['NamaBarang'];
     		$HJ = $harga;
@@ -1663,6 +1665,13 @@ VALUES ($max+1 , 'jim', 'sock')*/
 	redirect('admin/pembeliansparepart');
 	}
 
+    public function penjualanpart()
+    {
+        $this->template_admin->load('template_admin','Moduls/penjualanpart/index');
+    }
+
+    
+
 	public function biayaoperasional()
 	{
 		$this->template_admin->load('template_admin','Moduls/biayaoperasional/index');
@@ -1852,29 +1861,37 @@ VALUES ($max+1 , 'jim', 'sock')*/
 
         if(isset($btn_cetakPDF)){
             $selLaba = $this->Model_admin->manualQuery("SELECT
-                                                        a.tgl_lunas,
-                                                        SUM( IF ( b.jenis = 'SERVIS',b.total,0 ) ) AS TLabaServis,
-                                                        SUM( IF ( b.jenis = 'PART',b.total,0 ) ) AS TLabaPart, 
-                                                        SUM(b.harga_beli) AS TModalPart,
-                                                        SUM(b.total) AS Omzet
+                                                        b.tgl_lunas,
+                                                        SUM( IF ( a.jenis = 'SERVIS', a.total, 0 ) ) AS TLabaServis,
+                                                        SUM( IF ( a.jenis = 'PART', a.total, 0 ) ) AS TLabaPart,
+                                                        SUM( a.harga_beli ) AS TModalPart,
+                                                        SUM( a.total ) AS Omzet,
+                                                        b.Unit 
                                                     FROM
-                                                        transaksi AS a
-                                                        LEFT JOIN detil_transaksi AS b ON b.id = a.id 
+                                                        detil_transaksi AS a
+                                                        LEFT JOIN ( SELECT trx.tgl_lunas,trx.id,COUNT( trx.id ) AS Unit FROM transaksi AS trx GROUP BY
+                                                        trx.tgl_lunas) AS b ON b.id = a.id 
                                                     WHERE
-                                                        a.tgl_lunas BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' 
-                                                    GROUP BY a.tgl_lunas; ")->result();
+                                                        b.tgl_lunas BETWEEN '".$tgl_awal."' 
+                                                        AND '".$tgl_akhir."'
+                                                        GROUP BY
+                                                        b.tgl_lunas")->result();
             $selLabar = $this->Model_admin->manualQuery("SELECT
-                                                        a.tgl_lunas,
-                                                        SUM( IF ( b.jenis = 'SERVIS',b.total,0 ) ) AS TLabaServis,
-                                                        SUM( IF ( b.jenis = 'PART',b.total,0 ) ) AS TLabaPart, 
-                                                        SUM(b.harga_beli) AS TModalPart,
-                                                        SUM(b.total) AS Omzet
+                                                        b.tgl_lunas,
+                                                        SUM( IF ( a.jenis = 'SERVIS', a.total, 0 ) ) AS TLabaServis,
+                                                        SUM( IF ( a.jenis = 'PART', a.total, 0 ) ) AS TLabaPart,
+                                                        SUM( a.harga_beli ) AS TModalPart,
+                                                        SUM( a.total ) AS Omzet,
+                                                        b.Unit 
                                                     FROM
-                                                        transaksi AS a
-                                                        LEFT JOIN detil_transaksi AS b ON b.id = a.id 
+                                                        detil_transaksi AS a 
+                                                        LEFT JOIN ( SELECT trx.tgl_lunas,trx.id,COUNT( trx.id ) AS Unit FROM transaksi AS trx GROUP BY
+                                                        trx.tgl_lunas) AS b ON b.id = a.id 
                                                     WHERE
-                                                        a.tgl_lunas BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' 
-                                                    GROUP BY a.tgl_lunas; ");
+                                                        b.tgl_lunas BETWEEN '".$tgl_awal."' 
+                                                        AND '".$tgl_akhir."'
+                                                        GROUP BY
+                                                        b.tgl_lunas");
             $row = $selLabar->row();
 
         $pdf = new FPDF('l','mm','Letter');//A4,Letter,Legal
@@ -1894,25 +1911,29 @@ VALUES ($max+1 , 'jim', 'sock')*/
         $pdf->Cell(40,6,'LABA SERVIS',1,0);
         $pdf->Cell(40,6,'LABA PART',1,0);
         $pdf->Cell(40,6,'MODAL PART',1,0);
-        $pdf->Cell(40,6,'OMZET',1,1);
+        $pdf->Cell(40,6,'OMZET',1,0);
+        $pdf->Cell(40,6,'UNIT',1,1);
         $pdf->SetFont('Arial','',12);
         $no = 1;
         $TLabaServis="";
         $TLabaPart="";
         $TModalPart="";
         $Omzet="";
+        $Unit="";
         if(isset($row)){
         foreach ($selLaba as $row){
             $TLabaServis = $TLabaServis+$row->TLabaServis;
             $TLabaPart = $TLabaPart+$row->TLabaPart;
             $TModalPart = $TModalPart+$row->TModalPart;
             $Omzet = $Omzet+$row->Omzet;
+            $Unit = $Unit+$row->Unit;
             $pdf->Cell(20,6,$no,1,0);
             $pdf->Cell(40,6,$row->tgl_lunas,1,0);
             $pdf->Cell(40,6,format_angka($row->TLabaServis),1,0);
             $pdf->Cell(40,6,format_angka($row->TLabaPart),1,0);
             $pdf->Cell(40,6,format_angka($row->TModalPart),1,0); 
-            $pdf->Cell(40,6,format_angka($row->Omzet),1,1); 
+            $pdf->Cell(40,6,format_angka($row->Omzet),1,0); 
+            $pdf->Cell(40,6,format_angka($row->Unit),1,1); 
         $no++;
         }
 
@@ -1922,27 +1943,130 @@ VALUES ($max+1 , 'jim', 'sock')*/
         $pdf->Cell(40,7,'Rp. '.format_angka($TLabaPart),1,0);
         $pdf->Cell(40,7,'Rp. '.format_angka($TModalPart),1,0);
         $pdf->Cell(40,7,'Rp. '.format_angka($Omzet),1,0);
+        $pdf->Cell(40,7,$Unit,1,1);
         }
         $pdf->Output();
         }else{
             $selLaba = $this->Model_admin->manualQuery("SELECT
-                                                        a.tgl_lunas,
-                                                        SUM( IF ( b.jenis = 'SERVIS',b.total,0 ) ) AS TLabaServis,
-                                                        SUM( IF ( b.jenis = 'PART',b.total,0 ) ) AS TLabaPart, 
-                                                        SUM(b.harga_beli) AS TModalPart,
-                                                        SUM(b.total) AS Omzet
+                                                        b.tgl_lunas,
+                                                        SUM( IF ( a.jenis = 'SERVIS', a.total, 0 ) ) AS TLabaServis,
+                                                        SUM( IF ( a.jenis = 'PART', a.total, 0 ) ) AS TLabaPart,
+                                                        SUM( a.harga_beli ) AS TModalPart,
+                                                        SUM( a.total ) AS Omzet,
+                                                        b.Unit 
                                                     FROM
-                                                        transaksi AS a
-                                                        LEFT JOIN detil_transaksi AS b ON b.id = a.id 
+                                                        detil_transaksi AS a 
+                                                        LEFT JOIN ( SELECT trx.tgl_lunas,trx.id,COUNT( trx.id ) AS Unit FROM transaksi AS trx GROUP BY
+                                                        trx.tgl_lunas) AS b ON b.id = a.id 
                                                     WHERE
-                                                        a.tgl_lunas BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' 
-                                                    GROUP BY a.tgl_lunas; ")->result();
+                                                        b.tgl_lunas BETWEEN '".$tgl_awal."' 
+                                                        AND '".$tgl_akhir."'
+                                                        GROUP BY
+                                                        b.tgl_lunas")->result();
             $data = array(
                 'selLabas'=> $selLaba,
                 'btn_tampil'=> $btn_tampil,
                 );
             $this->template_admin->load('template_admin','Moduls/lapomzet/index',$data);
             }
+    }
+
+    public function cetaktrx($id)
+    {
+
+        $query = $this->Model_admin->manualQuery("SELECT
+                                                    id,
+                                                    jenis,
+                                                    keterangan,
+                                                    harga,
+                                                    qty,
+                                                    total 
+                                                FROM
+                                                    detil_transaksi 
+                                                WHERE
+                                                    id = '".$id."'")->result();
+        $query2 = $this->Model_admin->manualQuery("SELECT
+                                                        a.nopol,
+                                                        a.customer_id,
+                                                        a.km,
+                                                        a.keluhan,
+                                                        a.mekanik,
+                                                        a.waktu1,
+                                                        a.waktu2,
+                                                        a.keterangan,
+                                                        a.nama_cust,
+                                                        a.tipe_motor,
+                                                        a.tgl_lunas,
+                                                        b.nama AS mekanik
+                                                    FROM
+                                                        transaksi AS a
+                                                    LEFT JOIN karyawan AS b ON b.karyawan_id=a.id_mekanik
+                                                     WHERE a.id='".$id."'");
+        $row = $query2->row_array();
+        $nopol = $row['nopol'];
+        $km = $row['km'];
+        $keluhan = $row['keluhan'];
+        $mekanik = $row['mekanik'];
+        $waktu1 = $row['waktu1'];
+        $waktu2 = $row['waktu2'];
+        $keterangan = $row['keterangan'];
+        $nama_cust = $row['nama_cust'];
+        $tipe_motor = $row['tipe_motor'];
+        $tgl_lunas = $row['tgl_lunas'];
+
+        $currdate = date('d-m-Y');
+        $pdf = new FPDF('l','mm','Letter');//A4,Letter,Legal
+        // membuat halaman baru
+        $pdf->AddPage('L');
+        // setting jenis font yang akan digunakan
+        $pdf->SetFont('Arial','B',16);
+        // mencetak string 
+        $pdf->Cell(275,7,'KWITANSI ProMatic 002',0,1,'C');
+        $pdf->SetFont('Arial','B',12);
+        $pdf->Cell(275,7,'Tanggal : '. $tgl_lunas,0,1,'C');
+        // Memberikan space kebawah agar tidak terlalu rapat
+        $pdf->Cell(30,7,'',0,1);
+        $pdf->Cell(30,7,'',0,1);
+
+        $pdf->SetFont('Arial','B',9);
+        $pdf->Cell(20,6,'Nama Pelanggan  : '.$nama_cust,0,1);
+        $pdf->Cell(20,6,'No Polisi  : '.$nopol,0,1);
+        $pdf->Cell(20,6,'Tipe Motor : '.$tipe_motor,0,1);
+        $pdf->Cell(20,6,'Keluhan : '.$keluhan,0,1);
+        $pdf->Cell(20,6,'Mekanik : '.$mekanik,0,1);
+
+        $pdf->Cell(30,7,'',0,1);
+
+        $pdf->SetFont('Arial','B',10);
+        $pdf->Cell(20,6,'No',1,0);
+        $pdf->Cell(40,6,'Jenis',1,0);
+        $pdf->Cell(40,6,'KETERANGAN',1,0);
+        $pdf->Cell(40,6,'HARGA',1,0);
+        $pdf->Cell(40,6,'QTY',1,0);
+        $pdf->Cell(40,6,'TOTAL',1,1);
+        $pdf->SetFont('Arial','',12);
+        
+        $no = 1;
+        $TOTAL ="";
+        foreach ($query as $row){
+            /*$TLabaServis = $TLabaServis+$row->TLabaServis;
+            $TLabaPart = $TLabaPart+$row->TLabaPart;
+            $TModalPart = $TModalPart+$row->TModalPart;
+            $Omzet = $Omzet+$row->Omzet;*/
+            $TOTAL = $TOTAL+$row->total;
+            $pdf->Cell(20,6,$no,1,0);
+            $pdf->Cell(40,6,$row->jenis,1,0);
+            $pdf->Cell(40,6,$row->keterangan,1,0);
+            $pdf->Cell(40,6,format_angka($row->harga),1,0);
+            $pdf->Cell(40,6,$row->qty,1,0); 
+            $pdf->Cell(40,6,format_angka($row->total),1,1); 
+        $no++;
+        }
+
+        $pdf->SetFont('Arial','B',14);
+        $pdf->Cell(180,7,'TOTAL',1,0,'C');
+        $pdf->Cell(40,7,'Rp. '.format_angka($TOTAL),1,0);
+        $pdf->Output();
     }
 
 

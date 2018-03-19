@@ -25,7 +25,7 @@ class Masterbarang_model extends CI_Model {
 			$this->db->from($this->table);
 			$this->db->where('cabang_id', $id);
 		}*/
-			$this->db->select('a.KodeBarang,a.NamaBarang,a.Satuan,a.HargaJual,a.Status,b.harga AS HPP');
+			$this->db->select('a.KodeBarang,a.NamaBarang,a.Satuan,a.HargaJual,a.Status,a.HPP');//b.harga AS HPP
 			$this->db->from($this->table.' AS a');
 			$this->db->join('sparepart_pmb AS b', 'a.KodeBarang=b.kode','left');
         $i = 0;
